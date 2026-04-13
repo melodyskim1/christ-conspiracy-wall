@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christ Conspiracy Wall</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500&display=swap');
+
+  :root {
+    --bg: #faf8f4;
+    --surface: #ffffff;
+    --surface-hover: #f5f2ec;
+    --border: #e2ddd4;
+    --border-light: #eee9e1;
+    --text: #2c2520;
+    --text-dim: #7a716a;
+    --text-muted: #b0a89e;
+    --accent: #9e7c4b;
+    --accent-light: rgba(158, 124, 75, 0.12);
+    --accent-mid: rgba(158, 124, 75, 0.25);
+    --thread-color: #8b4513;
+    --thread-glow: rgba(139, 69, 19, 0.15);
+    --cat-prophetic: #8b4513;
+    --cat-typological: #9e7c4b;
+    --cat-liturgical: #5a7a6b;
+    --cat-covenantal: #7b6b8a;
+    --cat-structural: #7a6b50;
+    --cat-geographic: #5a7a8a;
+    --cat-historical: #8a6b5a;
+    --hl-a: #b8860b;
+    --hl-b: #5a7a6b;
+    --hl-c: #8b6b4a;
+    --hl-d: #5a708a;
+    --hl-e: #8a5a6b;
+    --hl-f: #6b8a5a;
+    --hl-g: #7a6b8a;
+    --hl-h: #5a8a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'EB Garamond', Georgia, serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── Mode bar ── */
+  .mode-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; gap: 0;
+    padding: 14px 32px;
+    background: var(--bg);
+  }
+  .mode-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 7px 22px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text-muted);
+    cursor: pointer; transition: all 0.3s ease;
+  }
+  .mode-btn:first-of-type { border-radius: 4px 0 0 4px; }
+  .mode-btn:nth-of-type(3) { border-radius: 0 4px 4px 0; }
+  .mode-btn + .mode-btn { margin-left: -1px; }
+  .mode-btn:hover { color: var(--text-dim); background: var(--surface-hover); }
+  .mode-btn.active {
+    background: var(--surface); color: var(--accent);
+    border-color: var(--accent); position: relative; z-index: 1;
+  }
+  .mode-title {
+    font-family: 'Inter', sans-serif; font-size: 10px;
+    color: var(--text-muted); margin-left: auto; letter-spacing: 0.04em;
+  }
+
+  /* ── Thread bar ── */
+  .thread-bar {
+    position: fixed; top: 50px; left: 0; right: 0; z-index: 99;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 32px; background: var(--bg);
+    opacity: 0; pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .thread-bar.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .thread-label {
+    font-family: 'Inter', sans-serif; font-size: 10px;
+    color: var(--text-muted); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-right: 4px;
+  }
+  .thread-btn {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+    padding: 4px 14px; border: 1px solid var(--border);
+    border-radius: 20px; background: transparent;
+    color: var(--text-dim); cursor: pointer; transition: all 0.25s ease;
+  }
+  .thread-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .thread-btn.active {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* ── Canvas (zoom/pan container) ── */
+  .canvas {
+    position: absolute; inset: 0; overflow: hidden;
+    cursor: grab;
+  }
+  .canvas.panning { cursor: grabbing; }
+  .canvas-inner {
+    position: absolute;
+    width: 2200px; height: 1600px;
+    transform-origin: 0 0;
+  }
+  .connections-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1; pointer-events: none;
+  }
+
+  /* ── Zoom controls ── */
+  .zoom-controls {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 98; display: flex; flex-direction: column; gap: 2px;
+  }
+  .zoom-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: var(--surface); color: var(--text-dim);
+    font-family: 'Inter', sans-serif; font-size: 16px;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .zoom-reset { font-size: 12px; }
+
+  /* ── Category floating labels ── */
+  .cat-label {
+    position: absolute; z-index: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    opacity: 0.25; pointer-events: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cat-label .cl-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+  }
+
+  /* ── Node cards ── */
+  .node {
+    position: absolute; z-index: 2;
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                top 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.4s ease;
+    cursor: pointer;
+  }
+  .node-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+    width: 145px;
+    transition: all 0.35s ease;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .node:hover .node-card {
+    border-color: var(--accent);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    z-index: 5;
+  }
+  .node.dimmed { opacity: 0.07; pointer-events: none; }
+  .node.highlighted .node-card {
+    border-color: var(--accent);
+    box-shadow: 0 2px 16px var(--thread-glow);
+  }
+  .node-id {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px; color: var(--text-muted);
+    letter-spacing: 0.06em; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .node-id .cat-dot {
+    display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  }
+  .node-title {
+    font-size: 13px; font-weight: 600;
+    line-height: 1.25; color: var(--text);
+  }
+  .node-desc {
+    font-size: 11px; line-height: 1.4;
+    color: var(--text-dim); margin-top: 5px;
+    display: none;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .node-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px; color: var(--text-muted);
+    margin-top: 4px; display: none;
+  }
+
+  /* ── Expanded state (thread active) ── */
+  .node.expanded .node-card {
+    width: 200px; padding: 14px 16px;
+    border-left: 2px solid var(--accent);
+  }
+  .node.expanded .node-id { font-size: 10px; }
+  .node.expanded .node-title { font-size: 16px; }
+  .node.expanded .node-desc {
+    display: -webkit-box;
+  }
+  .node.expanded .node-date { display: block; }
+
+  /* ── Timeline mode ── */
+  .timeline-layer {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .timeline-layer.visible { opacity: 1; pointer-events: auto; }
+
+  .tl-axis {
+    position: absolute;
+    top: 65%; left: 5%; right: 5%;
+    height: 1px; background: var(--border);
+  }
+  .tl-era {
+    position: absolute; top: 8px;
+    transform: translateX(-50%);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; color: var(--text-muted);
+  }
+  .tl-era::before {
+    content: ''; position: absolute;
+    top: -8px; left: 50%; width: 1px; height: 5px;
+    background: var(--text-muted);
+  }
+  .tl-dot {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 9px; height: 9px; border-radius: 50%;
+    cursor: pointer; transition: all 0.2s;
+    top: 0;
+  }
+  .tl-dot:hover {
+    width: 13px; height: 13px;
+    box-shadow: 0 0 0 3px rgba(158, 124, 75, 0.2);
+  }
+  .tl-dot-label {
+    position: absolute; top: 8px; left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    transform-origin: top left;
+    font-family: 'Inter', sans-serif;
+    font-size: 8px; color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .tl-tooltip {
+    position: absolute; bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0; transition: opacity 0.2s;
+    z-index: 10;
+  }
+  .tl-dot:hover .tl-tooltip { opacity: 1; }
+  .tl-tooltip-title {
+    font-size: 14px; font-weight: 600; color: var(--text);
+  }
+  .tl-tooltip-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; color: var(--text-muted); margin-top: 2px;
+  }
+
+  /* ── Reading panel ── */
+  .reading-overlay {
+    position: fixed; inset: 0;
+    background: rgba(44, 37, 32, 0.08);
+    z-index: 200; opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .reading-overlay.open { opacity: 1; pointer-events: auto; }
+  .reading-panel {
+    position: fixed; top: 0; right: 0;
+    width: 520px; max-width: 90vw; height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 201; overflow-y: auto; padding: 0;
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.06);
+  }
+  .reading-panel.open { transform: translateX(0); }
+  .rp-header {
+    position: sticky; top: 0; background: var(--surface);
+    border-bottom: 1px solid var(--border-light);
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 2;
+  }
+  .rp-header-label {
+    font-family: 'Inter', sans-serif; font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.04em;
+  }
+  .rp-close-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: none; color: var(--text-dim);
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all 0.2s;
+    font-size: 18px; line-height: 1;
+  }
+  .rp-close-btn:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-light);
+  }
+  .rp-body-content { padding: 32px 28px 48px; }
+  .rp-body-content .rp-id {
+    font-family: 'Inter', sans-serif; font-size: 11px;
+    letter-spacing: 0.06em; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rp-body-content .rp-cat-dot {
+    width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+  }
+  .rp-body-content h2 {
+    font-size: 30px; font-weight: 600;
+    margin-bottom: 4px; line-height: 1.2; color: var(--text);
+  }
+  .rp-body-content .rp-date {
+    font-family: 'Inter', sans-serif; font-size: 12px;
+    color: var(--text-muted); margin-bottom: 28px;
+  }
+  .rp-section { margin-bottom: 28px; }
+  .rp-section-title {
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 10px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border-light);
+  }
+  .rp-text { font-size: 18px; line-height: 1.75; color: var(--text); }
+  .rp-text em { color: var(--accent); font-style: italic; }
+  .rp-ref {
+    font-family: 'Inter', sans-serif; font-size: 12px;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+  .rp-connections-list { list-style: none; padding: 0; }
+  .rp-connections-list li {
+    padding: 10px 12px; margin-bottom: 4px; border-radius: 4px;
+    font-size: 15px; color: var(--text-dim);
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .rp-connections-list li:hover { background: var(--surface-hover); color: var(--text); }
+  .rp-connections-list li .conn-id {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+    color: var(--accent); flex-shrink: 0;
+  }
+  .rp-sources {
+    font-size: 14px; line-height: 1.6;
+    color: var(--text-dim); font-style: italic;
+  }
+  .hl {
+    border-bottom: 1.5px solid transparent;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    padding: 0 1px; cursor: default;
+  }
+  .hl-A { border-bottom-color: var(--hl-a); }
+  .hl-B { border-bottom-color: var(--hl-b); }
+  .hl-C { border-bottom-color: var(--hl-c); }
+  .hl-D { border-bottom-color: var(--hl-d); }
+  .hl-E { border-bottom-color: var(--hl-e); }
+  .hl-F { border-bottom-color: var(--hl-f); }
+  .hl-G { border-bottom-color: var(--hl-g); }
+  .hl-H { border-bottom-color: var(--hl-h); }
+  .hl.active { background: rgba(158, 124, 75, 0.15); border-bottom-width: 2px; }
+  blockquote.rp-quote {
+    border-left: 2px solid var(--border); padding-left: 16px;
+    margin: 12px 0; font-style: italic; font-size: 17px;
+    line-height: 1.7; color: var(--text);
+  }
+  .rp-quote-ref {
+    font-family: 'Inter', sans-serif; font-size: 11px;
+    color: var(--text-muted); margin-top: 4px; font-style: normal;
+  }
+  .hl-key { font-size: 14px; line-height: 1.7; color: var(--text-dim); }
+
+  /* ── Text list mode ── */
+  .text-list {
+    position: absolute; inset: 0; overflow-y: auto;
+    padding: 72px 32px 48px;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+  }
+  .text-list.visible { opacity: 1; pointer-events: auto; }
+  .text-list-inner { max-width: 680px; margin: 0 auto; }
+  .text-cat-header {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 16px 0 8px; margin-top: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .text-cat-header .tch-dot {
+    width: 6px; height: 6px; border-radius: 50%; display: inline-block;
+  }
+  .text-item {
+    border-bottom: 1px solid var(--border-light);
+    padding: 24px 0; cursor: pointer; transition: all 0.25s;
+  }
+  .text-item:hover { padding-left: 8px; }
+  .text-item .ti-header {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px;
+  }
+  .text-item .ti-id { font-family: 'Inter', sans-serif; font-size: 11px; flex-shrink: 0; }
+  .text-item .ti-title { font-size: 22px; font-weight: 600; color: var(--text); }
+  .text-item .ti-date {
+    font-family: 'Inter', sans-serif; font-size: 10px;
+    color: var(--text-muted); margin-left: auto; flex-shrink: 0;
+  }
+  .text-item .ti-preview {
+    font-size: 16px; line-height: 1.65; color: var(--text-dim);
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .text-item .ti-connections-count {
+    font-family: 'Inter', sans-serif; font-size: 10px;
+    color: var(--text-muted); margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="mode-bar">
+  <button class="mode-btn active" data-mode="thread">Thread</button>
+  <button class="mode-btn" data-mode="timeline">Timeline</button>
+  <button class="mode-btn" data-mode="text">Text</button>
+  <span class="mode-title">57 nodes</span>
+</div>
+
+<div class="thread-bar visible" id="threadBar">
+  <span class="thread-label">Pull thread:</span>
+  <button class="thread-btn active" data-thread="all">All</button>
+  <button class="thread-btn" data-thread="piercing">Piercing</button>
+  <button class="thread-btn" data-thread="lamb">Lamb</button>
+  <button class="thread-btn" data-thread="substitution">Substitution</button>
+  <button class="thread-btn" data-thread="access">Access to God</button>
+  <button class="thread-btn" data-thread="covenant">Covenant</button>
+  <button class="thread-btn" data-thread="thirdday">Third Day</button>
+</div>
+
+<div class="canvas" id="canvas">
+  <div class="canvas-inner" id="canvasInner">
+    <svg class="connections-svg" id="connectionsSvg"></svg>
+    <div id="nodesContainer"></div>
+  </div>
+</div>
+
+<!-- Timeline layer (separate from canvas zoom) -->
+<div class="timeline-layer" id="timelineLayer">
+  <svg id="tlSvg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></svg>
+  <div class="tl-axis" id="tlAxis"></div>
+  <div id="tlDotsContainer"></div>
+</div>
+
+<div class="text-list" id="textList">
+  <div class="text-list-inner" id="textListInner"></div>
+</div>
+
+<div class="zoom-controls" id="zoomControls">
+  <button class="zoom-btn" id="zoomIn">+</button>
+  <button class="zoom-btn" id="zoomOut">&minus;</button>
+  <button class="zoom-btn zoom-reset" id="zoomReset">&#x21BA;</button>
+</div>
+
+<div class="reading-overlay" id="readingOverlay"></div>
+<div class="reading-panel" id="readingPanel">
+  <div class="rp-header">
+    <span class="rp-header-label" id="rpHeaderLabel"></span>
+    <button class="rp-close-btn" id="rpClose">&times;</button>
+  </div>
+  <div class="rp-body-content" id="rpContent"></div>
+</div>
+
+<script>
+// ── NODE DATA ──
+const catColors = {
+  'Prophetic': 'var(--cat-prophetic)',
+  'Typological': 'var(--cat-typological)',
+  'Liturgical': 'var(--cat-liturgical)',
+  'Covenantal': 'var(--cat-covenantal)',
+  'Structural': 'var(--cat-structural)',
+  'Geographic': 'var(--cat-geographic)',
+  'Historical': 'var(--cat-historical)',
+};
+const nodes = [
+// ── PROPHETIC ──
+{
+  id: 'P1', cat: 'Prophetic',
+  title: 'Bethlehem, 700 Years Early',
+  desc: 'Micah named the exact town of the Messiah\u2019s birth 700 years in advance \u2014 not Jerusalem, but a village so small the prophet acknowledged its insignificance.',
+  date: '~700 BC', year: -700,
+  whoa: `Around 700 BC, the prophet Micah named the exact town where the Messiah would be born \u2014 not Jerusalem, not any major city, but Bethlehem, a village so small that Micah himself acknowledges its insignificance. Seven centuries later, a Roman census decree forces a carpenter from Nazareth to travel to his ancestral town at precisely the right moment. A pagan bureaucratic mechanism becomes the instrument of prophetic fulfillment.`,
+  otRef: 'Micah 5:2 (~700 BC)',
+  ot: `"But you, O [A:Bethlehem Ephrathah], who are [B:too little to be among the clans of Judah], from you shall come forth for me one who is to be [C:ruler in Israel], whose coming forth is from of old, from ancient days."`,
+  nt: `"Now after Jesus was born in [A:Bethlehem] of Judea in the days of Herod the king, behold, wise men from the east came to Jerusalem, saying, \u2018Where is he who has been born [C:king of the Jews]?\u2019"\n\u2014 Matthew 2:1\u20132\n\n"And Joseph also went up from Galilee, from the town of Nazareth, to Judea, to [A:the city of David, which is called Bethlehem]... And she gave birth to her firstborn son."\n\u2014 Luke 2:4\u20137`,
+  hlKey: '[A] Bethlehem named 700 years early \u00b7 [B] Insignificance acknowledged \u2014 God chooses the small \u00b7 [C] Ruler/King \u2014 the Messiah\u2019s royal identity',
+  sources: 'Vos, Biblical Theology; Bruce, NT Documents; Beale & Carson, Commentary on NT Use of OT',
+  conns: ['G2', 'T10', 'L5', 'C5', 'H2'],
+  threads: []
+},
+{
+  id: 'P2', cat: 'Prophetic',
+  title: 'Crucifixion Report, Written 700 BC',
+  desc: 'Isaiah 53 reads like a post-crucifixion medical and legal report \u2014 written 700 years before crucifixion was invented by the Persians.',
+  date: '~700 BC', year: -700,
+  whoa: `Despite being written approximately 700 years before the crucifixion, Isaiah 53 reads almost like a post-crucifixion medical and legal report. The passage describes the Messiah as pierced, silent before his accusers, numbered with transgressors, and buried with the rich. The correspondences between Isaiah\u2019s description and the Gospel accounts are specific enough that they reward reading side by side.`,
+  otRef: 'Isaiah 52:13\u201353:12 (~700 BC)',
+  ot: `"He was despised and rejected by men, a man of sorrows and acquainted with grief..."\n\n"He was [A:pierced for our transgressions], he was crushed for our iniquities; upon him was the chastisement that brought us peace, and [B:with his wounds we are healed]."\n\n"He was oppressed, and he was afflicted, yet [C:he opened not his mouth]; like a [D:lamb that is led to the slaughter], and like a sheep that before its shearers is silent, so [C:he opened not his mouth]."\n\n"And [E:they made his grave with the wicked] and [F:with a rich man in his death], although he had done no violence, and there was no deceit in his mouth."\n\n"...he was [G:numbered with the transgressors]; yet he bore the sin of many, and [H:makes intercession for the transgressors]."`,
+  nt: `"Then Pilate said to him, \u2018Do you not hear how many things they testify against you?\u2019 But [C:he gave him no answer, not even to a single charge]."\n\u2014 Matthew 27:13\u201314\n\n"Then [G:two robbers were crucified with him], one on the right and one on the left."\n\u2014 Matthew 27:38\n\n"One of the soldiers [A:pierced his side with a spear], and at once there came out blood and water."\n\u2014 John 19:34\n\n"When it was evening, there came [F:a rich man from Arimathea, named Joseph]... and laid it in [F:his own new tomb]."\n\u2014 Matthew 27:57\u201360\n\n"Jesus said, \u2018[H:Father, forgive them, for they know not what they do].\u2019"\n\u2014 Luke 23:34\n\n"[B:He himself bore our sins in his body on the tree, that we might die to sin and live to righteousness. By his wounds you have been healed]."\n\u2014 1 Peter 2:24`,
+  hlKey: '[A] Pierced \u2194 Pierced \u00b7 [B] Wounds heal \u2194 Wounds heal \u00b7 [C] Silent \u2194 No answer \u00b7 [D] Lamb to slaughter (\u2192 connects to T1) \u00b7 [E] Grave with wicked \u2194 Crucified with robbers \u00b7 [F] Rich man in death \u2194 Rich man\u2019s tomb \u00b7 [G] Numbered with transgressors \u2194 Two robbers \u00b7 [H] Intercession for transgressors \u2194 "Father, forgive them"',
+  sources: 'Motyer, The Prophecy of Isaiah; Childs, Isaiah (OTL); Beale & Carson, Commentary on NT Use of OT',
+  conns: ['T1', 'T4', 'L3', 'P3', 'P6', 'H1', 'S2'],
+  threads: ['piercing', 'lamb', 'substitution']
+},
+{
+  id: 'P3', cat: 'Prophetic',
+  title: '"They Pierced My Hands and Feet"',
+  desc: 'Psalm 22 describes crucifixion in first person \u2014 1,000 years before crucifixion existed. Jesus quotes its opening line from the cross.',
+  date: '~1000 BC', year: -1000,
+  whoa: `Psalm 22 was written by David roughly 1,000 years before crucifixion was developed by the Romans as a method of execution. Yet the psalm describes, in first person, experiences that correspond precisely to crucifixion: pierced hands and feet, bones out of joint, garments divided by lot. When Jesus quotes the psalm\u2019s opening line from the cross, he\u2019s not crying out in confusion \u2014 in Jewish practice, citing a psalm\u2019s first line was a way of invoking the entire text. The psalm ends not in despair but in universal worship.`,
+  otRef: 'Psalm 22 (~1000 BC)',
+  ot: `"[A:My God, my God, why have you forsaken me]?" \u2014 v.1\n\n"All who see me [B:mock me]; they make mouths at me; they wag their heads: \u2018[C:He trusts in God; let God deliver him]; let him rescue him, for he delights in him!\u2019" \u2014 v.7\u20138\n\n"I am [D:poured out like water, and all my bones are out of joint]... my [D:tongue sticks to the roof of my mouth]." \u2014 v.14\u201315\n\n"They have [E:pierced my hands and feet]." \u2014 v.16\n\n"They [F:divide my garments among them, and for my clothing they cast lots]." \u2014 v.18\n\n"All the ends of the earth shall remember and [G:turn to the LORD, and all the families of the nations shall worship before you]." \u2014 v.27`,
+  nt: `"About the ninth hour Jesus cried out with a loud voice, saying, \u2018[A:My God, my God, why have you forsaken me]?\u2019"\n\u2014 Matthew 27:46\n\n"[C:He trusts in God; let God deliver him now, if he desires him]."\n\u2014 Matthew 27:43 (the crowd\u2019s mockery \u2014 nearly verbatim from Psalm 22:8)\n\n"So the soldiers... took his garments and [F:divided them into four parts, one part for each soldier]; also his tunic... So they said, \u2018Let us not tear it, but [F:cast lots for it].\u2019"\n\u2014 John 19:23\u201324\n\n"But when they came to Jesus and saw that he was already dead, they did not break his legs. But one of the soldiers [E:pierced his side with a spear]."\n\u2014 John 19:33\u201334`,
+  hlKey: '[A] Forsaken cry \u2014 quoted verbatim from the cross \u00b7 [B][C] Mocking language \u2014 echoed nearly word-for-word by the crowd \u00b7 [D] Physical symptoms matching crucifixion physiology \u00b7 [E] Pierced \u00b7 [F] Garments divided by lots \u2014 fulfilled literally by Roman soldiers \u00b7 [G] Universal worship \u2014 the psalm moves from suffering to all nations turning to God',
+  sources: 'Kidner, Psalms 1\u201372; Hengstenberg, Commentary on the Psalms; Ross, Commentary on the Psalms',
+  conns: ['P2', 'P6', 'S5', 'L3', 'H1'],
+  threads: ['piercing']
+},
+{
+  id: 'P4', cat: 'Prophetic',
+  title: 'The Donkey Was Deliberate',
+  desc: 'Zechariah described the Messiah entering Jerusalem on a donkey, not a war horse. Jesus sent two disciples to retrieve a specific animal.',
+  date: '~520 BC', year: -520,
+  whoa: `Around 520 BC, Zechariah described the Messiah\u2019s entry into Jerusalem with a specific detail: he would come riding a donkey, not a war horse. In ancient Near Eastern symbolism, horses signified military conquest; donkeys signified peace. When Jesus enters Jerusalem, he doesn\u2019t just happen to ride a donkey \u2014 he sends two disciples to a specific village with specific instructions to retrieve a specific animal. The orchestration is deliberate, public, and meant to be recognized by anyone familiar with Zechariah\u2019s words.`,
+  otRef: 'Zechariah 9:9 (~520 BC)',
+  ot: `"Rejoice greatly, O daughter of Zion! Shout aloud, O daughter of Jerusalem! Behold, your [A:king] is coming to you; [B:righteous and having salvation is he], [C:humble and mounted on a donkey, on a colt, the foal of a donkey]."`,
+  nt: `"Jesus sent two disciples, saying to them, \u2018Go into the village in front of you, and immediately you will find [C:a donkey tied, and a colt with her]. Untie them and bring them to me.\u2019"\n\u2014 Matthew 21:1\u20132\n\n"The crowds that went before him and that followed him were shouting, \u2018Hosanna to the [A:Son of David]! Blessed is he who comes in the name of the Lord!\u2019"\n\u2014 Matthew 21:9\n\n"His disciples did not understand these things at first, but when Jesus was glorified, then they remembered that these things had been written of him and had been done to him."\n\u2014 John 12:16`,
+  hlKey: '[A] King \u2194 "Son of David" (royal acclamation) \u00b7 [B] Righteous and having salvation \u2014 the character of this king \u00b7 [C] Donkey \u2014 specifically procured and deliberately ridden',
+  sources: 'Wright, Jesus and the Victory of God; Robertson, The Christ of the Prophets',
+  conns: ['G4', 'C5', 'P5', 'P6', 'S5'],
+  threads: []
+},
+{
+  id: 'P5', cat: 'Prophetic',
+  title: 'The Price and the Potter\u2019s Field',
+  desc: 'Zechariah named the exact price of betrayal \u2014 thirty pieces of silver \u2014 and what would happen to the money afterward.',
+  date: '~520 BC', year: -520,
+  whoa: `Zechariah names not only the exact price of the Messiah\u2019s betrayal \u2014 thirty pieces of silver, which was the legal compensation for a slave in Exodus 21:32 \u2014 but also what would happen to the money afterward: thrown to the potter in the house of the LORD. Five centuries later, both the amount and the destination are fulfilled in specific, verifiable detail.`,
+  otRef: 'Zechariah 11:12\u201313 (~520 BC)',
+  ot: `"So they weighed out as my wages [A:thirty pieces of silver]. Then the LORD said to me, \u2018[B:Throw it] to the [C:potter]\u2019 \u2014 the lordly price at which I was priced by them. So I took the [A:thirty pieces of silver] and [B:threw them] into the [D:house of the LORD], to the [C:potter]."`,
+  nt: `"Then one of the twelve, whose name was Judas Iscariot, went to the chief priests and said, \u2018What will you give me if I deliver him over to you?\u2019 And they paid him [A:thirty pieces of silver]."\n\u2014 Matthew 26:14\u201315\n\n"And [B:throwing down the pieces of silver] [D:into the temple], he departed, and he went and hanged himself. But the chief priests, taking the pieces of silver, said, \u2018It is not lawful to put them into the treasury, since it is blood money.\u2019 So they took counsel and bought with them the [C:potter\u2019s field]."\n\u2014 Matthew 27:5\u20137`,
+  hlKey: '[A] Thirty pieces of silver \u2014 exact amount, also the price of a slave (Exodus 21:32) \u00b7 [B] Thrown \u2014 the money is cast away in both texts \u00b7 [C] Potter \u2014 the destination in both texts \u00b7 [D] House of the LORD / Temple \u2014 the location in both texts',
+  sources: 'Robertson, The Christ of the Prophets; Beale & Carson, Commentary on NT Use of OT',
+  conns: ['T5', 'C3', 'P4', 'P6', 'S5'],
+  threads: ['substitution']
+},
+{
+  id: 'P6', cat: 'Prophetic',
+  title: 'God Says "Me" \u2014 Then Says "Him"',
+  desc: 'In Zechariah 12:10, God speaks in first person: "they will look on ME whom they have pierced." Then the pronoun shifts to "Him" \u2014 a Trinitarian hint.',
+  date: '~520 BC', year: -520,
+  whoa: `In Zechariah 12:10, God is speaking in first person \u2014 and he says "they will look on ME whom they have pierced." The one being pierced is identified as YHWH himself. But then, within the same sentence, the pronoun shifts: "they shall mourn for HIM." This first-to-third-person shift within a single statement suggests a distinction of persons within God \u2014 the speaker (YHWH) and the pierced one are both God, yet are referred to differently. John records the Roman soldier piercing Jesus\u2019 side and immediately cites this verse.`,
+  otRef: 'Zechariah 12:10 (~520 BC)',
+  ot: `"And I will pour out on the house of David and the inhabitants of Jerusalem a spirit of grace and pleas for mercy, so that, when they [A:look on] [B:me, on him] whom they have [C:pierced], they shall mourn for [B:him], as one mourns for an [D:only child], and weep bitterly over him, as one weeps over a [D:firstborn]."`,
+  nt: `"But one of the soldiers [C:pierced his side with a spear], and at once there came out blood and water. He who saw it has borne witness \u2014 his testimony is true, and he knows that he is telling the truth \u2014 that you also may believe. For these things took place that the Scripture might be fulfilled... \u2018They will [A:look on him whom they have] [C:pierced].\u2019"\n\u2014 John 19:34\u201337\n\n"For God so loved the world, that he gave his [D:only Son]."\n\u2014 John 3:16`,
+  hlKey: '[A] "Look on" \u2014 the gaze of faith directed at the pierced one \u00b7 [B] Me/Him shift \u2014 the Trinitarian hint: YHWH speaking of himself in both first and third person \u00b7 [C] Pierced \u2014 the physical detail, confirmed by an eyewitness \u00b7 [D] Only child / firstborn \u2194 only Son',
+  sources: 'Bavinck, Reformed Dogmatics vol. 2; Vos, Biblical Theology; Carson, The Gospel According to John',
+  conns: ['P2', 'P3', 'T3', 'S7', 'H1'],
+  threads: ['piercing']
+},
+{
+  id: 'P7', cat: 'Prophetic',
+  title: 'The Builders Rejected the Foundation',
+  desc: 'Psalm 118 describes a stone that professional builders rejected \u2014 which becomes the cornerstone. Jesus quotes it directly to the leaders rejecting him.',
+  date: '~500 BC', year: -500,
+  whoa: `Psalm 118 describes a stone that professional builders examined and rejected \u2014 yet that same stone becomes the most important structural element of the entire building: the cornerstone. Jesus quotes this passage directly to the chief priests and Pharisees, the religious "builders" of Israel, while they are in the active process of rejecting him. Matthew records that they understood exactly what he meant.`,
+  otRef: 'Psalm 118:22\u201323; Isaiah 28:16',
+  ot: `"The [A:stone] that the [B:builders] rejected has become the [C:cornerstone]. This is the LORD\u2019s doing; it is marvelous in our eyes."\n\n"Behold, I am the one who has laid as a foundation in Zion, a [A:stone], a tested stone, a precious [C:cornerstone], of a sure foundation."`,
+  nt: `"Jesus said to them, \u2018Have you never read in the Scriptures: "The [A:stone] that the [B:builders rejected] has become the [C:cornerstone]"?\u2019 ...When the chief priests and the Pharisees heard his parables, they perceived that he was speaking about them."\n\u2014 Matthew 21:42, 45\n\n"This Jesus is the [A:stone] that was [B:rejected by you, the builders], which has become the [C:cornerstone]."\n\u2014 Acts 4:11\n\n"Built on the foundation of the apostles and prophets, Christ Jesus himself being the [C:cornerstone], in whom the whole structure, being joined together, grows into a holy temple in the Lord."\n\u2014 Ephesians 2:20\u201321`,
+  hlKey: '[A] Stone \u2014 Christ as the foundational element \u00b7 [B] Builders rejected \u2014 the religious authorities who should have recognized him \u00b7 [C] Cornerstone \u2014 the stone they rejected becomes the foundation of everything',
+  sources: 'Beale, The Temple and the Church\u2019s Mission; Clowney, The Unfolding Mystery',
+  conns: ['T7', 'L3', 'C6', 'S6'],
+  threads: []
+},
+{
+  id: 'P8', cat: 'Prophetic',
+  title: 'The Impossibility Escalates',
+  desc: 'God sustains the Messiah\u2019s lineage through women who cannot conceive, and the impossibility escalates with each generation until it reaches a virgin.',
+  date: '~735 BC', year: -735,
+  whoa: `Isaiah prophesied that a virgin would conceive and bear a son called Immanuel \u2014 "God with us." But this prophecy sits within a larger biblical pattern: God repeatedly sustains the Messiah\u2019s lineage through women who cannot conceive, and the impossibility escalates with each generation. By the time the pattern reaches Mary, it has moved from "unlikely" to "biologically unprecedented," making it clear that the seed-line is God\u2019s initiative from start to finish.`,
+  otRef: 'Isaiah 7:14 (~735 BC)',
+  ot: `"Therefore the Lord himself will give you a sign. Behold, the [A:virgin] shall conceive and bear a [B:son], and shall call his name [C:Immanuel]."`,
+  nt: `"And the angel said to her, \u2018Do not be afraid, Mary, for you have found favor with God. And behold, you will conceive in your womb and bear a [B:son], and you shall call his name Jesus.\u2019... And Mary said to the angel, \u2018How will this be, since I am a [A:virgin]?\u2019 And the angel answered her, \u2018The Holy Spirit will come upon you, and the power of the Most High will [D:overshadow] you.\u2019"\n\u2014 Luke 1:30\u201331, 34\u201335\n\n"All this took place to fulfill what the Lord had spoken by the prophet: \u2018Behold, the [A:virgin] shall conceive and bear a [B:son], and they shall call his name [C:Immanuel]\u2019 (which means, God with us)."\n\u2014 Matthew 1:22\u201323`,
+  hlKey: '[A] Virgin \u2014 the escalation reaches its apex \u00b7 [B] Son \u2014 each impossible birth produces a critical figure \u00b7 [C] Immanuel / "God with us" \u2014 the child\u2019s identity \u00b7 [D] "Overshadow" \u2014 the Greek word (episkiaz\u014d) is the same used for the glory cloud over the tabernacle in Exodus 40:35',
+  sources: 'Motyer, The Prophecy of Isaiah; Machen, The Virgin Birth of Christ; Vos, Biblical Theology',
+  conns: ['S1', 'C1', 'T7', 'P1'],
+  threads: []
+},
+{
+  id: 'P9', cat: 'Prophetic',
+  title: 'Jesus Retakes Israel\u2019s Exam',
+  desc: 'Jesus recapitulates Israel\u2019s story \u2014 Egypt, water, wilderness, temptation \u2014 and succeeds at every point where Israel failed, quoting Deuteronomy each time.',
+  date: '~750 BC', year: -750,
+  whoa: `When Hosea wrote "out of Egypt I called my son," he was clearly referring to Israel\u2019s Exodus. Matthew applies it to Jesus\u2019 return from Egypt after Herod\u2019s death \u2014 which looks like a stretch until you see the pattern. Jesus systematically recapitulates Israel\u2019s story: he goes into Egypt and returns, passes through water (baptism), enters the wilderness for 40 days (matching Israel\u2019s 40 years), and faces three temptations. He responds to each by quoting Deuteronomy \u2014 Israel\u2019s wilderness-failure book \u2014 at exactly the points where Israel failed.`,
+  otRef: 'Hosea 11:1 (~750 BC)',
+  ot: `"When [A:Israel] was a child, I loved him, and [B:out of Egypt I called my] [C:son]."\n\nIsrael\u2019s failures in Deuteronomy:\n"Man does not live by [D:bread alone], but by every word that comes from the mouth of the LORD." \u2014 Deuteronomy 8:3\n"You shall not [E:put the LORD your God to the test]." \u2014 Deuteronomy 6:16\n"You shall [F:worship the LORD your God and him only shall you serve]." \u2014 Deuteronomy 6:13`,
+  nt: `"And he rose and took the child and his mother by night and departed to Egypt and remained there until the death of Herod. This was to fulfill what the Lord had spoken by the prophet, \u2018[B:Out of Egypt I called my] [C:son].\u2019"\n\u2014 Matthew 2:14\u201315\n\n"Then Jesus was led up by the Spirit into the [A:wilderness] to be tempted... And the tempter came and said, \u2018If you are the [C:Son of God], command these stones to become loaves of bread.\u2019 But he answered, \u2018[D:Man shall not live by bread alone]...\u2019 Then the devil took him to the holy city... \u2018If you are the [C:Son of God], throw yourself down.\u2019 Jesus said, \u2018[E:You shall not put the Lord your God to the test].\u2019 ...the devil showed him all the kingdoms of the world... Jesus said, \u2018[F:You shall worship the Lord your God and him only shall you serve].\u2019"\n\u2014 Matthew 4:1\u201310`,
+  hlKey: '[A] Israel / wilderness \u2014 Jesus recapitulates Israel\u2019s wilderness experience \u00b7 [B] Out of Egypt \u2014 literal geographic parallel \u00b7 [C] Son \u2014 Israel called God\u2019s son, Jesus IS God\u2019s Son \u00b7 [D][E][F] Three Deuteronomy quotations \u2014 Jesus quotes from Israel\u2019s wilderness-failure passages, succeeding where Israel failed',
+  sources: 'Beale, Handbook on NT Use of OT; Vos, Biblical Theology; France, The Gospel of Matthew',
+  conns: ['T9', 'S3', 'C3', 'G5'],
+  threads: []
+},
+{
+  id: 'P10', cat: 'Prophetic',
+  title: 'Deuteronomy\u2019s Last Line Is a Cliffhanger',
+  desc: 'Moses promised a prophet "like me." The Torah ends: "And there has not arisen a prophet since in Israel like Moses." The cliffhanger waited 1,400 years.',
+  date: '~1400 BC', year: -1400,
+  whoa: `Moses told Israel that God would raise up a prophet "like me" \u2014 and that the people must listen to him. The book of Deuteronomy then ends with an editorial note that reads like a deliberate cliffhanger: "And there has not arisen a prophet since in Israel like Moses." It\u2019s the final line of the Torah. The anticipated figure never came \u2014 until Jesus arrived and did everything Moses did, but greater: law from a mountain, bread in the wilderness, covenant mediation, face-to-face communion with God.`,
+  otRef: 'Deuteronomy 18:15, 18; 34:10 (~1400 BC)',
+  ot: `"The LORD your God will raise up for you a [A:prophet like me] from among your brothers \u2014 it is to [B:him you shall listen]."\n\n"And [C:there has not arisen a prophet since in Israel like Moses], whom the LORD knew [D:face to face]."`,
+  nt: `"And a voice came out of the cloud, saying, \u2018This is my Son, my Chosen One; [B:listen to him]!\u2019"\n\u2014 Luke 9:35 (the Transfiguration \u2014 echoing Deut 18:15 verbatim)\n\n"Moses was faithful in all God\u2019s house as a [E:servant], to testify to the things that were to be spoken later, but Christ is faithful over God\u2019s house as a [E:Son]. And he has been counted worthy of more glory than Moses."\n\u2014 Hebrews 3:5\u20136\n\n"For the law was given through Moses; [F:grace and truth came through Jesus Christ]. No one has ever seen God; the only God, who is at the Father\u2019s side \u2014 he has made him known."\n\u2014 John 1:17\u201318`,
+  hlKey: '[A] Prophet like Moses \u2014 the awaited figure \u00b7 [B] "Listen to him" \u2014 the Father\u2019s voice at the Transfiguration echoes Deuteronomy\u2019s command \u00b7 [C] "There has not arisen" \u2014 the Torah\u2019s unresolved ending \u00b7 [D] Face to face \u2014 Moses saw partially; Jesus IS God revealed \u00b7 [E] Servant vs. Son \u2014 the "greater than" logic \u00b7 [F] Moses brought law; Christ brought grace and truth',
+  sources: 'Vos, Biblical Theology; Clowney, The Unfolding Mystery; Kline, Treaty of the Great King',
+  conns: ['T6', 'T8', 'C3', 'S4', 'L6', 'S6'],
+  threads: []
+},
+// ── TYPOLOGICAL ──
+{
+  id: 'T1', cat: 'Typological',
+  title: 'No Bones Broken',
+  desc: 'The Passover lamb must be without blemish, its blood saves from death, and none of its bones may be broken. Roman soldiers broke the others\u2019 legs but not Jesus\u2019.',
+  date: '~1446 BC', year: -1446,
+  whoa: `The Passover lamb had several specific requirements: it had to be without blemish, its blood on the doorposts would cause death to "pass over" the household, and \u2014 strangely \u2014 none of its bones could be broken. This last requirement has no obvious practical purpose in meal preparation, which makes it stand out as pointing to something beyond itself. When Roman soldiers came to break the legs of the three crucified men, they broke the legs of both criminals but found Jesus already dead and did not break his. John explicitly cites the Passover regulation. A hostile Jewish source, the Babylonian Talmud, independently confirms that Jesus was executed on the eve of Passover.`,
+  otRef: 'Exodus 12:5, 7, 13, 46 (~1446 BC)',
+  ot: `"Your [A:lamb] shall be [B:without blemish], a male a year old..."\n\n"Then they shall take some of the [C:blood] and put it on the two doorposts and the lintel of the houses in which they eat it."\n\n"The [C:blood] shall be a sign for you... and when I see the blood, I will [D:pass over you], and no plague will befall you."\n\n"...you shall [E:not break any of its bones]."`,
+  nt: `"The next day he saw Jesus coming toward him, and said, \u2018Behold, the [A:Lamb of God], who takes away the sin of the world!\u2019"\n\u2014 John 1:29\n\n"You were ransomed... with the precious [C:blood] of Christ, like that of a [A:lamb] [B:without blemish or spot]."\n\u2014 1 Peter 1:18\u201319\n\n"Cleanse out the old leaven that you may be a new lump, as you really are unleavened. For Christ, our [D:Passover lamb], has been sacrificed."\n\u2014 1 Corinthians 5:7\n\n"So the soldiers came and broke the legs of the first, and of the other who had been crucified with him. But when they came to Jesus and saw that he was already dead, [E:they did not break his legs]... For these things took place that the Scripture might be fulfilled: \u2018[E:Not one of his bones will be broken].\u2019"\n\u2014 John 19:32\u201333, 36`,
+  hlKey: '[A] Lamb \u2014 Jesus identified as the Lamb of God \u00b7 [B] Without blemish \u2194 without blemish or spot \u00b7 [C] Blood on doorposts / blood that saves \u00b7 [D] Pass over \u2194 "our Passover lamb" \u00b7 [E] Bones not broken \u2014 fulfilled literally when soldiers skip Jesus',
+  sources: 'Morales, Who Shall Ascend the Mountain of the Lord?; Robertson, The Christ of the Covenants; Pitre, Jesus and the Jewish Roots of the Eucharist',
+  conns: ['L1', 'P2', 'T2', 'T4', 'S2', 'C3', 'G1', 'H2'],
+  threads: ['lamb', 'substitution']
+},
+{
+  id: 'T2', cat: 'Typological',
+  title: 'Same Mountain, Same Son',
+  desc: 'Abraham takes his "only son, whom you love" to Mount Moriah. Isaac carries the wood. A ram in thorns is substituted. The location? The same ridge as Golgotha.',
+  date: '~2000 BC', year: -2000,
+  whoa: `In Genesis 22, God tells Abraham to take "your son, your only son, whom you love" to Mount Moriah and offer him as a sacrifice. Isaac, who is old enough to carry the wood for his own burnt offering up the mountain, asks his father: "Where is the lamb?" Abraham\u2019s response is prophetic: "God will provide for himself the lamb." At the last moment, a ram caught in a thicket of thorns is substituted. Abraham names the place with a statement in future tense: "On the mount of the LORD it shall be provided." 2 Chronicles 3:1 identifies Mount Moriah as the site where Solomon later built the temple. Tradition places Golgotha on the same ridge \u2014 the place where God\u2019s own Son carried wood up the mountain and was crowned with thorns.`,
+  otRef: 'Genesis 22:2, 6\u20138, 13\u201314 (~2000 BC)',
+  ot: `"Take your [A:son, your only son, whom you love], Isaac, and go to the land of Moriah, and offer him there as a burnt offering on one of the [B:mountains] of which I shall tell you."\n\n"And Abraham took the [C:wood] of the burnt offering and [C:laid it on Isaac his son]..."\n\n"Isaac said, \u2018Behold, the fire and the wood, but where is the [D:lamb] for a burnt offering?\u2019 Abraham said, \u2018[D:God will provide for himself the lamb] for a burnt offering, my son.\u2019"\n\n"And Abraham lifted up his eyes and looked, and behold, behind him was a ram, caught in a [E:thicket] by his horns."\n\n"So Abraham called the name of that place, \u2018The LORD will provide\u2019; as it is said to this day, \u2018[B:On the mount of the LORD it shall be provided].\u2019"`,
+  nt: `"For God so loved the world, that he gave his [A:only Son]."\n\u2014 John 3:16\n\n"He who did not spare his own [A:Son] but gave him up for us all..."\n\u2014 Romans 8:32\n\n"And [C:he went out, bearing his own cross]."\n\u2014 John 19:17\n\n"And the soldiers twisted together a crown of [E:thorns] and put it on his head."\n\u2014 John 19:2\n\n"By faith Abraham, when he was tested, offered up Isaac... He considered that God was able even to raise him from the dead, from which, figuratively speaking, he did receive him back."\n\u2014 Hebrews 11:17, 19`,
+  hlKey: '[A] "Your son, your only son, whom you love" \u2194 "his only Son" \u00b7 [B] Mount Moriah \u2194 Golgotha \u2014 same ridge, prophecy in the place-name \u00b7 [C] Wood carried by the son \u2194 cross carried by Jesus \u00b7 [D] "God will provide the lamb" \u2014 prophetic statement fulfilled at the cross \u00b7 [E] Ram in the thicket / thorns \u2194 crown of thorns',
+  sources: 'Vos, Biblical Theology; Morales, Who Shall Ascend; Levenson, The Death and Resurrection of the Beloved Son',
+  conns: ['G1', 'T1', 'P2', 'C2', 'S3', 'S2'],
+  threads: ['lamb', 'substitution', 'thirdday']
+},
+{
+  id: 'T3', cat: 'Typological',
+  title: 'The Curse on a Pole Becomes the Cure',
+  desc: 'God\u2019s remedy for the serpent bites was counterintuitive: a bronze serpent on a pole. Look at the image of what\u2019s killing you and live. Jesus cites this as a direct type.',
+  date: '~1400 BC', year: -1400,
+  whoa: `When Israel was bitten by venomous serpents in the wilderness, God\u2019s prescribed remedy was counterintuitive: make a bronze serpent \u2014 an image of the very thing killing them \u2014 mount it on a pole, and tell the dying to look at it. Those who looked, lived. Jesus identifies this as a direct type of his own crucifixion, and this statement appears in John\u2019s Gospel immediately before the most famous verse in the Bible (John 3:16). The logic is the logic of the cross: the image of the curse, lifted up, becomes the instrument of salvation for those who look in faith.`,
+  otRef: 'Numbers 21:8\u20139 (~1400 BC)',
+  ot: `"And the LORD said to Moses, \u2018Make a [A:fiery serpent] and [B:set it on a pole], and everyone who is bitten, when he [C:sees it], shall [D:live].\u2019 So Moses made a [A:bronze serpent] and [B:set it on a pole]. And if a serpent bit anyone, he would [C:look at the bronze serpent] and [D:live]."`,
+  nt: `"And as Moses [B:lifted up the serpent in the wilderness], so must the [A:Son of Man] be [B:lifted up], that whoever [C:believes in him] may have [D:eternal life]. For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have [D:eternal life]."\n\u2014 John 3:14\u201316\n\n"For our sake he made him to be [A:sin who knew no sin], so that in him we might become the righteousness of God."\n\u2014 2 Corinthians 5:21\n\n"Christ redeemed us from the [A:curse of the law by becoming a curse for us] \u2014 for it is written, \u2018Cursed is everyone who is hanged on a tree.\u2019"\n\u2014 Galatians 3:13`,
+  hlKey: '[A] Serpent/curse \u2194 Christ "made to be sin" / "becoming a curse" \u00b7 [B] Lifted up on a pole \u2194 lifted up on the cross \u00b7 [C] Look / see \u2194 believe \u2014 the gaze of faith \u00b7 [D] Live \u2194 eternal life \u2014 the same outcome, escalated from physical to eternal',
+  sources: 'Beale, A New Testament Biblical Theology; Carson, The Gospel According to John',
+  conns: ['C1', 'P6', 'S7'],
+  threads: ['piercing', 'substitution']
+},
+{
+  id: 'T4', cat: 'Typological',
+  title: 'Two Goats, One Solves Both',
+  desc: 'Yom Kippur required two goats: one slaughtered for penalty, one sent away carrying sins. Christ does both \u2014 and Paul calls him the "mercy seat" itself.',
+  date: '~1446 BC', year: -1446,
+  whoa: `The Day of Atonement (Yom Kippur) was the most sacred day in Israel\u2019s calendar \u2014 the only day anyone entered the Holy of Holies, and only the high priest, only with blood. The ritual required two goats: one was slaughtered and its blood brought behind the veil to the mercy seat; the other (the scapegoat) had the people\u2019s sins confessed over its head and was sent into the wilderness carrying those sins away. One goat absorbed the penalty for sin. The other removed sin entirely. Christ does both \u2014 and remarkably, Paul uses the word hilast\u0113rion (literally "mercy seat") for Christ in Romans 3:25. Jesus isn\u2019t just making an offering at the mercy seat; he IS the mercy seat.`,
+  otRef: 'Leviticus 16:15\u201316, 21\u201322 (~1446 BC)',
+  ot: `"Then he shall kill the goat of the sin offering that is for the people and bring its [A:blood inside the veil]... and [A:sprinkle it on the] [B:mercy seat] and in front of the mercy seat."\n\n"And Aaron shall lay both his hands on the head of the live goat, and [C:confess over it all the iniquities of the people of Israel], and all their transgressions, all their sins. And he shall [C:put them on the head of the goat] and [D:send it away into the wilderness]... The goat shall [D:bear all their iniquities] on itself to a remote area."`,
+  nt: `"He entered [E:once for all] into the holy places, not by means of the [A:blood of goats and calves but by means of his own blood], thus securing an eternal redemption."\n\u2014 Hebrews 9:12\n\n"God put [Christ] forward as a [B:propitiation (hilast\u0113rion \u2014 \u2018mercy seat\u2019)] by his blood, to be received by faith."\n\u2014 Romans 3:25\n\n"As far as the east is from the west, so far does he [D:remove our transgressions from us]."\n\u2014 Psalm 103:12\n\n"For it is impossible for the blood of bulls and goats to take away sins."\n\u2014 Hebrews 10:4`,
+  hlKey: '[A] Blood brought into the Holy of Holies \u2194 Christ enters with his own blood \u00b7 [B] Mercy seat \u2194 Christ IS the mercy seat (hilast\u0113rion) \u00b7 [C] Sins confessed and transferred \u2194 "He bore our sins in his body" \u00b7 [D] Scapegoat bears sins away \u2194 sins removed "as far as east from west" \u00b7 [E] The annual repetition \u2194 Christ\u2019s "once for all"',
+  sources: 'Morales, Who Shall Ascend; Vos, Biblical Theology; Kline, Glory in Our Midst',
+  conns: ['L3', 'L6', 'P2', 'T1', 'G3', 'C6'],
+  threads: ['substitution', 'access']
+},
+{
+  id: 'T5', cat: 'Typological',
+  title: 'Sold by His Brothers, Saves His Brothers',
+  desc: 'Joseph\u2019s story parallels Christ\u2019s: beloved son, sold for silver, left for dead, raised to the right hand, saves the brothers who betrayed him.',
+  date: '~1900 BC', year: -1900,
+  whoa: `Joseph\u2019s narrative arc in Genesis 37\u201350 parallels Christ\u2019s story not through a single verse but through the shape of the entire narrative. The father\u2019s beloved son is sent to his brothers, who conspire against him, strip his robe, sell him for silver, and leave him for dead. He descends to the lowest place, then rises to the right hand of the world\u2019s ruler. From that position, he saves the very brothers who betrayed him \u2014 who don\u2019t recognize him at first, then are terrified when they do. His response summarizes the theology of the cross.`,
+  otRef: 'Genesis 37:3\u20134, 28; 50:19\u201320',
+  ot: `"Now Israel loved Joseph more than any other of his sons... his brothers saw that their father loved him more than all his brothers, [and] they hated him."\n\n"Then Midianite traders passed by. And they drew Joseph up and lifted him out of the pit, and [A:sold Joseph to the Ishmaelites for twenty pieces of silver]."\n\n"Joseph said to them, \u2018Do not fear... As for you, [B:you meant evil against me, but God meant it for good], [C:to bring it about that many people should be kept alive].\u2019"`,
+  nt: `"Then one of the twelve... went to the chief priests and said, \u2018What will you give me if I deliver him over to you?\u2019 And they paid him [A:thirty pieces of silver]."\n\u2014 Matthew 26:14\u201315\n\n"This Jesus, [B:delivered up according to the definite plan and foreknowledge of God], you crucified and killed by the hands of lawless men."\n\u2014 Acts 2:23\n\n"He who did not spare his own Son but gave him up for us all, how will he not also with him graciously give us all things?"\n\u2014 Romans 8:32`,
+  hlKey: '[A] Sold for silver \u2014 Joseph for 20 pieces, Jesus for 30 (the price of a slave had inflated) \u00b7 [B] Human evil and divine purpose operating simultaneously \u2014 the theological core of both stories \u00b7 [C] "To keep many alive" \u2014 Joseph\u2019s salvation is physical; Christ\u2019s is eternal',
+  sources: 'Clowney, The Unfolding Mystery; Hamilton, God\u2019s Glory in Salvation Through Judgment',
+  conns: ['P5', 'C2', 'G5', 'S6'],
+  threads: ['substitution']
+},
+{
+  id: 'T6', cat: 'Typological',
+  title: 'I AM the Bread',
+  desc: 'For 40 years God provided manna \u2014 bread from heaven. After feeding 5,000 in a wilderness, Jesus doesn\u2019t just offer bread. He says he IS the bread.',
+  date: '~1446 BC', year: -1446,
+  whoa: `For 40 years in the wilderness, God provided manna \u2014 bread that appeared on the ground each morning, enough for one day. A jar of manna was placed inside the Ark of the Covenant as a permanent memorial. When Jesus feeds 5,000 people in a wilderness setting \u2014 a deliberate echo of the manna provision \u2014 the crowd asks for more bread. His response reframes the entire conversation: he doesn\u2019t offer bread; he identifies himself as bread.`,
+  otRef: 'Exodus 16:4, 15, 31; Psalm 78:24\u201325 (~1446 BC)',
+  ot: `"Then the LORD said to Moses, \u2018Behold, I am about to [A:rain bread from heaven] for you.\u2019"\n\n"Moses said to them, \u2018[A:It is the bread that the LORD has given you to eat].\u2019"\n\n"He rained down on them [A:manna to eat] and gave them the [A:grain of heaven]. Man ate of the [B:bread of the angels]."`,
+  nt: `"Jesus said to them, \u2018Truly, truly, I say to you, it was not Moses who gave you the [A:bread from heaven], but my Father gives you the true [A:bread from heaven].\u2019... \u2018I am the [B:bread of life]; whoever comes to me shall not hunger, and whoever believes in me shall never thirst.\u2019... \u2018[C:Your fathers ate the manna in the wilderness, and they died]. This is the bread that comes down from heaven, so that one may eat of it and [C:not die].\u2019"\n\u2014 John 6:32, 35, 49\u201350`,
+  hlKey: '[A] Bread from heaven \u2014 manna described this way, Jesus claims the title \u00b7 [B] Bread of angels / Bread of life \u2014 the escalation from physical life to eternal life \u00b7 [C] "Your fathers ate and died... eat of this bread and not die" \u2014 the type sustained temporarily, the antitype eternally',
+  sources: 'Vos, Biblical Theology; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['P10', 'G2', 'L5', 'L1', 'S8', 'L7'],
+  threads: []
+},
+{
+  id: 'T7', cat: 'Typological',
+  title: 'God\u2019s Address Keeps Expanding',
+  desc: 'God\u2019s dwelling moves from garden to tent to temple to a body to a community to all reality. John says the Word "tabernacled" among us.',
+  date: '~1446 BC', year: -1446,
+  whoa: `The entire biblical narrative can be understood as God solving one problem: he wants to dwell with his people, but sin makes his unmediated presence fatal. The tabernacle and temple were the provisional solution \u2014 structures designed with Eden imagery that functioned as micro-Edens where God\u2019s presence was localized. When John says "the Word became flesh and tabernacled among us," he\u2019s using the Greek word for "pitched his tent." The trajectory is God\u2019s dwelling expanding: from a garden, to a tent, to a building, to a body, to a community, to all of reality.`,
+  otRef: 'Exodus 25:8; 40:34\u201335',
+  ot: `"And let them make me a [A:sanctuary], that I may [B:dwell in their midst]."\n\n"Then the cloud covered the tent of meeting, and the [C:glory of the LORD] [B:filled the tabernacle]."`,
+  nt: `"And the Word became flesh and [B:dwelt (eskēnōsen \u2014 \u2018tabernacled\u2019)] among us, and we have seen his [C:glory], glory as of the only Son from the Father."\n\u2014 John 1:14\n\n"Jesus answered them, \u2018[D:Destroy this temple, and in three days I will raise it up].\u2019... But he was speaking about the [D:temple of his body]."\n\u2014 John 2:19, 21\n\n"Do you not know that [A:you are God\u2019s temple] and that God\u2019s Spirit [B:dwells in you]?"\n\u2014 1 Corinthians 3:16\n\n"And I saw [E:no temple in the city], for its temple is the Lord God the Almighty and the Lamb."\n\u2014 Revelation 21:22`,
+  hlKey: '[A] Sanctuary / Temple \u2014 the dwelling expands from building to person to community \u00b7 [B] Dwell / filled / dwelt \u2014 the same concept across all stages \u00b7 [C] Glory \u2014 God\u2019s visible presence \u00b7 [D] "Destroy this temple" \u2014 Jesus identifies his body as the temple \u00b7 [E] No temple needed \u2014 in the new creation, God fills everything',
+  sources: 'Beale, The Temple and the Church\u2019s Mission; Morales, Who Shall Ascend the Mountain of the Lord?',
+  conns: ['L3', 'L5', 'L6', 'P7', 'S4', 'S7', 'S8', 'S9', 'G1', 'C1'],
+  threads: ['access']
+},
+{
+  id: 'T8', cat: 'Typological',
+  title: 'The Rock Was Christ (Paul Said It)',
+  desc: 'Moses struck a rock and water flowed. Paul doesn\u2019t say the rock symbolized Christ \u2014 he says "the Rock WAS Christ." And from Christ\u2019s pierced side: water and blood.',
+  date: '~1446 BC', year: -1446,
+  whoa: `When Israel was dying of thirst in the wilderness, God told Moses to strike a rock at Horeb, and water gushed out to sustain the people. Paul makes a startling interpretive move in 1 Corinthians 10: he doesn\u2019t say the rock symbolized or represented Christ \u2014 he says "the Rock was Christ." And notice the structural parallel: the rock is struck (broken open) and life-giving water flows out. Jesus is struck (crucified), and from his pierced side flows water and blood. There\u2019s also a significant second episode: in Numbers 20, God tells Moses to speak to the rock, but Moses strikes it twice in anger \u2014 and for this, Moses is barred from the Promised Land. The severity of the punishment only makes sense typologically: the Rock (Christ) is struck once.`,
+  otRef: 'Exodus 17:6; Numbers 20:8, 11\u201312 (~1446 BC)',
+  ot: `"Behold, I will stand before you there on the rock at Horeb, and you shall [A:strike the rock], and [B:water shall come out of it], and the people will drink."\n\n"\u2018[C:Tell the rock] before their eyes to yield its water.\u2019... And Moses lifted up his hand and [A:struck the rock] with his staff twice, and water came out abundantly... And the LORD said to Moses... \u2018[D:you shall not bring this assembly into the land].\u2019"`,
+  nt: `"For they drank from the spiritual Rock that followed them, and the [E:Rock was Christ]."\n\u2014 1 Corinthians 10:4\n\n"But one of the soldiers [A:pierced his side with a spear], and at once there came out [B:blood and water]."\n\u2014 John 19:34\n\n"It is impossible... if they then fall away, to restore them again to repentance, since they are again [D:crucifying the Son of God]."\n\u2014 Hebrews 6:4, 6`,
+  hlKey: '[A] Rock struck \u2194 Christ pierced \u2014 the breaking-open produces life \u00b7 [B] Water flows from the rock \u2194 Water flows from Christ\u2019s side \u00b7 [C] "Speak to the rock" \u2014 after the first striking, the approach changes \u00b7 [D] Moses\u2019s penalty for re-striking \u2194 the Hebrews warning against "re-crucifying" \u00b7 [E] "The Rock WAS Christ" \u2014 Paul\u2019s explicit identification',
+  sources: 'Vos, Biblical Theology; Beale, A New Testament Biblical Theology',
+  conns: ['P6', 'T1', 'S7', 'L6'],
+  threads: ['piercing']
+},
+{
+  id: 'T9', cat: 'Typological',
+  title: 'Israel Failed the Test. He Retook It.',
+  desc: 'Israel is called God\u2019s son, vine, and servant. Jesus takes every title and succeeds where Israel failed, point by point.',
+  date: '~750 BC', year: -750,
+  whoa: `Israel is called God\u2019s "son," God\u2019s "vine," and God\u2019s "servant" throughout the Old Testament. Jesus takes every one of these titles for himself. But more than titles, Jesus recapitulates Israel\u2019s narrative arc \u2014 and succeeds at every point where Israel failed. This is not coincidence or loose analogy; Matthew structures his entire Gospel to make the parallel unmistakable.`,
+  otRef: null,
+  ot: `"Israel is my [A:firstborn son]." \u2014 Exodus 4:22\n"You brought a [B:vine] out of Egypt." \u2014 Psalm 80:8\n"But you, Israel, my [C:servant]..." \u2014 Isaiah 41:8`,
+  nt: `"And a voice from heaven said, \u2018This is my beloved [A:Son].\u2019" \u2014 Matthew 3:17\n"[B:I am the true vine]." \u2014 John 15:1\n"Behold my [C:servant], whom I have chosen." \u2014 Matthew 12:18\n\nThe parallel sequence:\nIsrael goes into Egypt \u2192 Jesus goes into Egypt\nCalled out of Egypt \u2192 Called out of Egypt\nPasses through water (Red Sea) \u2192 Passes through water (Baptism)\nTested 40 years in wilderness \u2014 fails \u2192 Tested 40 days \u2014 succeeds\nGiven law at Sinai \u2192 Gives new law from mountain\n12 tribes \u2192 12 apostles`,
+  hlKey: '[A] Son \u2014 Israel called God\u2019s son, Jesus IS God\u2019s Son \u00b7 [B] Vine \u2014 Israel the unfaithful vine, Jesus the true vine \u00b7 [C] Servant \u2014 Israel the failing servant, Jesus the faithful servant',
+  sources: 'Vos, Biblical Theology; Wright, The Climax of the Covenant; Beale, A New Testament Biblical Theology; France, Jesus and the OT',
+  conns: ['P9', 'S3', 'T12', 'C1'],
+  threads: []
+},
+{
+  id: 'T10', cat: 'Typological',
+  title: 'A Cursed Foreigner in the Messiah\u2019s Bloodline',
+  desc: 'Deuteronomy excludes Moabites from the assembly. Ruth is a Moabite \u2014 yet she becomes David\u2019s great-grandmother and an ancestor of Jesus.',
+  date: '~1100 BC', year: -1100,
+  whoa: `Deuteronomy 23:3 explicitly excludes Moabites from the assembly of the LORD. Ruth is a Moabite. Yet through the legal mechanism of kinsman-redemption, she is grafted into Israel, marries Boaz, and becomes the great-grandmother of King David \u2014 and an ancestor of Jesus. Matthew includes her by name in Jesus\u2019 genealogy, alongside three other women with outsider or irregular status. The Messiah\u2019s own bloodline includes people the law seemingly excluded.`,
+  otRef: 'Ruth 1:16; 4:13, 17; Leviticus 25:25',
+  ot: `"Ruth said, \u2018Your people shall be my people, and [A:your God my God].\u2019"\n\n"So [B:Boaz] took Ruth, and she became his wife... and she bore a son... They named him Obed. He was the father of Jesse, the [C:father of David]."\n\n"If your brother becomes poor and sells part of his property, then his [D:nearest redeemer] shall come and redeem what his brother has sold."`,
+  nt: `"...and Salmon the father of [B:Boaz] by Rahab, and Boaz the father of Obed by [A:Ruth], and Obed the father of Jesse, and Jesse the father of [C:David the king]."\n\u2014 Matthew 1:5\u20136`,
+  hlKey: '[A] Ruth \u2014 a Moabite (excluded by Deut 23:3) grafted into Israel and into the Messiah\u2019s line \u00b7 [B] Boaz \u2014 the kinsman-redeemer (goel), a type of Christ \u00b7 [C] David \u2014 Ruth\u2019s great-grandson, the royal line \u00b7 [D] Kinsman-redeemer law \u2014 Christ fulfills the three requirements: become kin, able to pay, willing',
+  sources: 'Robertson, The Christ of the Covenants; Clowney, The Unfolding Mystery; Block, Ruth (NAC)',
+  conns: ['G2', 'C5', 'S10', 'P1'],
+  threads: []
+},
+{
+  id: 'T11', cat: 'Typological',
+  title: 'The Reluctant Prophet\u2019s Underwater Preview',
+  desc: 'Jesus explicitly identifies Jonah as a type: three days in the fish, then Gentile repentance follows. "Something greater than Jonah is here."',
+  date: '~780 BC', year: -780,
+  whoa: `Jesus makes the Jonah connection himself \u2014 it\u2019s one of the few OT types he explicitly identifies. But the parallel extends beyond the three-day timing. Jonah\u2019s emergence from the fish leads to the repentance of Gentiles (the Ninevites). Christ\u2019s resurrection leads to the gospel going to all nations. The contrast is also instructive: Jonah is the reluctant prophet who resents Gentile inclusion; Jesus willingly dies for it.`,
+  otRef: 'Jonah 1:17; 3:5, 10 (~780 BC)',
+  ot: `"And the LORD appointed a great fish to swallow up Jonah. And Jonah was in the belly of the fish [A:three days and three nights]."\n\n"And the people of [B:Nineveh] believed God."\n\n"When God saw what they did, how they [B:turned from their evil way], God relented."`,
+  nt: `"For just as [A:Jonah was three days and three nights in the belly of the great fish], so will the [A:Son of Man be three days and three nights in the heart of the earth]. The men of [B:Nineveh] will rise up at the judgment with this generation and condemn it, for [B:they repented at the preaching of Jonah], and behold, [C:something greater than Jonah is here]."\n\u2014 Matthew 12:40\u201341`,
+  hlKey: '[A] Three days \u2014 Jonah in the fish \u2194 Jesus in the tomb \u00b7 [B] Gentile repentance follows \u2014 Nineveh \u2194 all nations \u00b7 [C] "Something greater" \u2014 the type is surpassed by the antitype',
+  sources: 'Hamilton, God\u2019s Glory in Salvation Through Judgment; Beale & Carson',
+  conns: ['S3', 'S6', 'S10'],
+  threads: ['thirdday']
+},
+{
+  id: 'T12', cat: 'Typological',
+  title: 'The Vineyard Owner Sent His Son',
+  desc: 'Isaiah\u2019s vineyard song about Israel\u2019s failure becomes Jesus\u2019 parable about the tenants who kill the owner\u2019s son. Then he says: "I am the true vine."',
+  date: '~700 BC', year: -700,
+  whoa: `In Isaiah 5, God describes himself as a farmer who plants a vineyard (Israel), tends it carefully, and expects good fruit \u2014 but gets wild grapes instead. When Jesus tells the Parable of the Wicked Tenants, he uses the same vineyard setup from Isaiah 5, but extends the story: the owner sends servants (prophets) who are beaten and killed, then sends his own son, whom the tenants kill. Then Jesus identifies himself as the true vine \u2014 what Israel was meant to be.`,
+  otRef: 'Isaiah 5:1\u20132, 4, 7 (~700 BC)',
+  ot: `"My beloved had a [A:vineyard] on a very fertile hill. He dug it and cleared it of stones, and planted it with choice vines... he looked for it to yield [B:grapes], but it yielded [B:wild grapes]."\n\n"What more was there to do for my vineyard, that I have not done in it?"\n\n"For the [A:vineyard] of the LORD of hosts is the house of [C:Israel]."`,
+  nt: `"There was a master of a house who planted a [A:vineyard]... and let it out to tenants... When the season for fruit drew near, he sent his servants to the tenants to get his [B:fruit]... Last of all he sent his [D:son] to them, saying, \u2018They will respect my son.\u2019 But when the tenants saw the son, they said to themselves, \u2018This is the heir. Come, let us [D:kill him].\u2019"\n\u2014 Matthew 21:33\u201338\n\n"[C:I am the true vine], and my Father is the vinedresser... Abide in me, and I in you. As the branch cannot bear [B:fruit] by itself unless it abides in the vine, neither can you, unless you abide in me."\n\u2014 John 15:1, 4`,
+  hlKey: '[A] Vineyard \u2014 same image, Isaiah to Jesus \u00b7 [B] Fruit expected \u2014 Israel fails; believers produce it by abiding in Christ \u00b7 [C] Israel as vine \u2194 "I am the TRUE vine" \u00b7 [D] The son sent and killed \u2014 Jesus adds himself to Isaiah\u2019s parable',
+  sources: 'Beale, A New Testament Biblical Theology; Wright, The Climax of the Covenant',
+  conns: ['T9', 'C2', 'S10', 'L1'],
+  threads: []
+},
+// ── LITURGICAL ──
+{
+  id: 'L1', cat: 'Liturgical',
+  title: 'The Unfinished Seder',
+  desc: 'The Passover seder has four cups. Jesus redefines the third \u2014 the Cup of Redemption \u2014 and deliberately leaves the fourth cup undrunk until "my Father\u2019s kingdom."',
+  date: '~1446 BC', year: -1446,
+  whoa: `The Passover seder includes four cups of wine, each corresponding to one of God\u2019s four promises in Exodus 6:6\u20137. At the Last Supper, Jesus takes the third cup \u2014 the Cup of Redemption ("I will redeem you") \u2014 and redefines it: "This cup is the new covenant in my blood." He then makes a striking statement: he will not drink the fourth cup \u2014 the Cup of Consummation \u2014 until he drinks it "new in my Father\u2019s kingdom." He deliberately leaves the seder unfinished.`,
+  otRef: 'Exodus 6:6\u20137',
+  ot: `"I will [A:bring you out] from under the burdens of the Egyptians, and I will [B:deliver you] from slavery to them, and I will [C:redeem you] with an outstretched arm and with great acts of judgment. I will [D:take you to be my people], and I will be your God."`,
+  nt: `"And he took a cup, and when he had given thanks he said, \u2018Take this, and divide it among yourselves. For I tell you that from now on I will not drink of the fruit of the vine until the kingdom of God comes.\u2019... And likewise the cup after supper, saying, \u2018[C:This cup that is poured out for you is the new covenant in my blood].\u2019"\n\u2014 Luke 22:17\u201320\n\n"I tell you I will [D:not drink again of this fruit of the vine until that day when I drink it new with you in my Father\u2019s kingdom]."\n\u2014 Matthew 26:29\n\n"Blessed are those who are invited to the [D:marriage supper of the Lamb]."\n\u2014 Revelation 19:9`,
+  hlKey: '[A][B] First two cups \u2014 deliverance from bondage, already fulfilled in the Exodus \u00b7 [C] Third cup \u2014 Redemption \u2014 Jesus identifies this as "the new covenant in my blood" \u00b7 [D] Fourth cup \u2014 deliberately postponed to "my Father\u2019s kingdom"',
+  sources: 'Pitre, Jesus and the Jewish Roots of the Eucharist; Kline, Treaty of the Great King; Robertson, The Christ of the Covenants',
+  conns: ['T1', 'C6', 'T12', 'S9', 'L2'],
+  threads: ['lamb', 'covenant']
+},
+{
+  id: 'L2', cat: 'Liturgical',
+  title: 'Four Feasts Fulfilled on Their Exact Days',
+  desc: 'Leviticus prescribes seven annual feasts. The first four were fulfilled on their precise calendar dates. The last three remain unfulfilled.',
+  date: '~1446 BC', year: -1446,
+  whoa: `Leviticus 23 prescribes seven annual feasts for Israel. The first four correspond to events in Christ\u2019s death and resurrection \u2014 and were fulfilled not just thematically but on their precise calendar dates. The last three remain unfulfilled and are widely understood as eschatological. The calendrical precision of the first four creates a pattern that generates expectation about the last three.`,
+  otRef: null,
+  ot: `The seven feasts: Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Day of Atonement, Tabernacles.\n\n"These are a shadow of the things to come, but the substance belongs to Christ." \u2014 Colossians 2:17\n\n[A:Passover] (Nisan 14) \u2192 Jesus crucified on Passover\n[B:Unleavened Bread] (Nisan 15) \u2192 Jesus in the tomb \u2014 sinless bread, no corruption\n[C:Firstfruits] (Nisan 17\u201318) \u2192 Jesus rises on Firstfruits\n[D:Pentecost] (50 days later) \u2192 The Holy Spirit comes exactly 50 days after resurrection`,
+  nt: `"[A:Christ, our Passover lamb, has been sacrificed]." \u2014 1 Corinthians 5:7\n\n"But in fact [C:Christ has been raised from the dead, the firstfruits of those who have fallen asleep]." \u2014 1 Corinthians 15:20\n\n"When the day of [D:Pentecost] arrived, they were all together in one place. And suddenly there came from heaven a sound like a mighty rushing wind." \u2014 Acts 2:1\u20132`,
+  hlKey: '[A] Passover \u2014 crucifixion on the feast day \u00b7 [B] Unleavened Bread \u2014 "you will not let your Holy One see corruption" \u00b7 [C] Firstfruits \u2014 resurrection on the feast day; Paul uses the exact term \u00b7 [D] Pentecost \u2014 Spirit comes on the exact feast day, 50 days later',
+  sources: 'Morales, Who Shall Ascend; Robertson, The Christ of the Prophets; Vos, Biblical Theology',
+  conns: ['T1', 'T4', 'S3', 'S9', 'H1'],
+  threads: []
+},
+{
+  id: 'L3', cat: 'Liturgical',
+  title: 'Torn from Top to Bottom',
+  desc: 'The temple veil \u2014 60 feet tall, a handbreadth thick \u2014 tears from top to bottom at the moment Jesus dies. God tears it open from his side.',
+  date: '~30 AD', year: 30,
+  whoa: `The veil in the temple separated the Holy of Holies \u2014 where God\u2019s presence dwelled above the mercy seat \u2014 from everyone except the high priest, who could enter only once a year, only on the Day of Atonement, only with sacrificial blood. Ancient tradition describes the veil as approximately 60 feet tall, 30 feet wide, and a handbreadth thick. At the exact moment Jesus dies, it tears \u2014 and the Gospel writers specify the direction: from top to bottom. Not from the bottom up, as human hands would tear. From the top down \u2014 God tears it open from his side.`,
+  otRef: 'Exodus 26:33; Leviticus 16:2',
+  ot: `"And the [A:veil] shall separate for you the Holy Place from the [B:Most Holy]."\n\n"Tell Aaron your brother not to come at any time into the [B:Holy Place inside the veil], before the mercy seat that is on the ark, so that he may not die."`,
+  nt: `"And Jesus cried out again with a loud voice and yielded up his spirit. And behold, the [A:curtain of the temple was] [C:torn in two, from top to bottom]."\n\u2014 Matthew 27:51\n\n"Therefore, brothers, since we have confidence to enter the [B:holy places] by the blood of Jesus, by the [D:new and living way that he opened for us through the] [A:curtain, that is, through his flesh]..."\n\u2014 Hebrews 10:19\u201320`,
+  hlKey: '[A] Veil / curtain \u2014 the barrier between humanity and God\u2019s presence \u00b7 [B] Holy of Holies \u2014 access once restricted, now open \u00b7 [C] Torn from top to bottom \u2014 the direction indicates divine action \u00b7 [D] "Through the curtain, that is, through his flesh" \u2014 his body is torn so the way is opened',
+  sources: 'Morales, Who Shall Ascend; Beale, The Temple and the Church\u2019s Mission; Lane, Hebrews (WBC)',
+  conns: ['T4', 'T7', 'P2', 'C6'],
+  threads: ['access', 'substitution']
+},
+{
+  id: 'L4', cat: 'Liturgical',
+  title: 'Killed Outside the Camp',
+  desc: 'The red heifer \u2014 without defect, never yoked \u2014 is killed outside the camp to purify from death. Jesus suffered outside the gate.',
+  date: '~1400 BC', year: -1400,
+  whoa: `Numbers 19 prescribes a red heifer \u2014 perfectly red, without any blemish, and one that has never worn a yoke (meaning its submission is voluntary). This heifer is killed outside the camp, and its ashes are used to purify anyone who has been contaminated by contact with death. The author of Hebrews connects this directly to Jesus, noting that he "suffered outside the gate" \u2014 Golgotha was outside Jerusalem\u2019s walls.`,
+  otRef: 'Numbers 19:2\u20133, 9 (~1400 BC)',
+  ot: `"Tell the people of Israel to bring you a red heifer [A:without defect], in which there is no blemish, and on which a [B:yoke has never come]. And you shall give it to Eleazar the priest, and it shall be taken [C:outside the camp] and slaughtered before him."\n\n"And a man who is clean shall gather up the ashes of the heifer and deposit them outside the camp... for the [D:water for impurity, for the removal of sin]."`,
+  nt: `"For the bodies of those animals whose blood is brought into the holy places by the high priest as a sacrifice for sin are burned [C:outside the camp]. So Jesus also [C:suffered outside the gate] in order to sanctify the people through his own blood."\n\u2014 Hebrews 13:11\u201312\n\n"[B:No one takes my life from me, but I lay it down of my own accord]."\n\u2014 John 10:18`,
+  hlKey: '[A] Without defect \u2194 sinless \u00b7 [B] Never yoked \u2014 voluntary submission \u2194 "I lay it down of my own accord" \u00b7 [C] Outside the camp \u2194 outside the gate \u2014 Golgotha outside Jerusalem\u2019s walls \u00b7 [D] Purification from death-contamination \u2014 Christ\u2019s death purifies from sin and death',
+  sources: 'Morales, Who Shall Ascend; Wenham, Numbers (TOTC)',
+  conns: ['T4', 'P2', 'G3', 'L3'],
+  threads: ['lamb', 'substitution']
+},
+{
+  id: 'L5', cat: 'Liturgical',
+  title: 'Twelve Loaves in God\u2019s Face',
+  desc: 'Twelve loaves of bread sat perpetually "before the face" of God \u2014 one for each tribe. Jesus claims to be the bread of life, available to everyone.',
+  date: '~1446 BC', year: -1446,
+  whoa: `Inside the Holy Place of the tabernacle, twelve loaves of bread \u2014 one for each tribe of Israel \u2014 were placed on a golden table, perpetually "before the face" of God. They were replaced every Sabbath and eaten only by priests. When Jesus calls himself "the bread of life," he\u2019s claiming to be the reality this ritual pointed to: the sustenance of God\u2019s people in God\u2019s presence, available not just to priests but to everyone.`,
+  otRef: 'Leviticus 24:5\u20136, 8\u20139',
+  ot: `"You shall take fine flour and bake [A:twelve loaves] from it... And you shall set them in two rows, six in a row, on the table of pure gold [B:before the LORD]."\n\n"Every [C:Sabbath day] Aaron shall arrange it before the LORD regularly."`,
+  nt: `"[B:I am the bread of life]; whoever comes to me shall not hunger."\n\u2014 John 6:35\n\n"Have you not read what David did... how he entered the house of God and ate the [A:bread of the Presence], which it was not lawful for him to eat...? ...the [C:Son of Man is lord of the Sabbath]."\n\u2014 Mark 2:25\u201328`,
+  hlKey: '[A] Twelve loaves \u2014 representing all twelve tribes, the whole people of God \u00b7 [B] "Before the LORD" / Bread of life \u2014 sustenance in God\u2019s presence \u00b7 [C] Sabbath \u2014 Jesus claims authority over both the bread and the day',
+  sources: 'Morales, Who Shall Ascend; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['T6', 'G2', 'L1', 'T7'],
+  threads: ['access']
+},
+{
+  id: 'L6', cat: 'Liturgical',
+  title: 'The Priest-King Problem',
+  desc: 'Kings from Judah, priests from Levi \u2014 no one held both offices. Melchizedek predated the system. Jesus\u2019 priesthood supersedes it.',
+  date: '~1000 BC', year: -1000,
+  whoa: `In Israel\u2019s system, the offices of king and priest were strictly separated \u2014 kings came from the tribe of Judah, priests from the tribe of Levi. No one could hold both offices. Yet Psalm 110 declares: "You are a priest forever after the order of Melchizedek." Melchizedek appears in Genesis 14 as both king of Salem AND priest of God Most High \u2014 centuries before the Levitical system existed. He brings bread and wine, and Abraham pays tithes to him.`,
+  otRef: 'Psalm 110:4; Genesis 14:18\u201320',
+  ot: `"The LORD has sworn and will not change his mind, \u2018You are a [A:priest forever] after the order of [B:Melchizedek].\u2019"\n\n"And [B:Melchizedek] [C:king of Salem] brought out [D:bread and wine]. (He was [A:priest] of God Most High.) And he blessed him..."`,
+  nt: `"So also Christ did not exalt himself to be made a [A:high priest], but was appointed by him who said to him... \u2018You are a [A:priest forever], after the order of [B:Melchizedek].\u2019"\n\u2014 Hebrews 5:5\u20136\n\n"For it is evident that our Lord was descended from [E:Judah], and in connection with that tribe Moses said nothing about [A:priests]."\n\u2014 Hebrews 7:14\n\n"We have such a high priest, one who is seated at the [C:right hand of the throne] of the Majesty in heaven."\n\u2014 Hebrews 8:1`,
+  hlKey: '[A] Priest \u2014 but not from Levi; from an older, superior order \u00b7 [B] Melchizedek \u2014 king AND priest, predating the Levitical system \u00b7 [C] King of Salem / right hand of the throne \u00b7 [D] Bread and wine \u2014 the elements of the Lord\u2019s Supper \u00b7 [E] Judah \u2014 the tribal problem resolved by a priesthood that predates Levi',
+  sources: 'Vos, The Teaching of the Epistle to the Hebrews; Lane, Hebrews (WBC); Morales, Who Shall Ascend',
+  conns: ['T4', 'L3', 'C2', 'C5', 'S6'],
+  threads: ['access']
+},
+{
+  id: 'L7', cat: 'Liturgical',
+  title: 'He Died on Day Six and Said "Finished"',
+  desc: 'God finished creation on day six and rested on the seventh. Jesus dies on Friday, says "It is finished," rests in the tomb on the Sabbath, and rises on day one.',
+  date: '~30 AD', year: 30,
+  whoa: `In the creation account, God works for six days and rests on the seventh \u2014 not from exhaustion but because the work is complete. Jesus dies on Friday \u2014 day six \u2014 and his final word is "It is finished" (tetelestai). He rests in the tomb on the Sabbath (day seven). He rises on Sunday \u2014 the first day of the new week. The early church recognized the resurrection as the inauguration of new creation.`,
+  otRef: 'Genesis 2:1\u20133',
+  ot: `"Thus the heavens and the earth were [A:finished], and all the host of them. And on the [B:seventh day] God [A:finished] his work that he had done, and he [C:rested] on the seventh day."`,
+  nt: `"When Jesus had received the sour wine, he said, \u2018[A:It is finished],\u2019 and he bowed his head and gave up his spirit."\n\u2014 John 19:30\n\n"So there remains a [C:Sabbath rest] for the people of God, for whoever has entered God\u2019s rest has also [A:rested from his works] as God did from his."\n\u2014 Hebrews 4:9\u201310\n\n"Therefore, if anyone is in Christ, he is a [D:new creation]."\n\u2014 2 Corinthians 5:17`,
+  hlKey: '[A] "Finished" \u2014 the same concept in creation and crucifixion \u00b7 [B] Seventh day \u2014 Jesus in the tomb on the Sabbath \u00b7 [C] Rest \u2014 God rested because creation was done; Christ rests because redemption is done \u00b7 [D] New creation \u2014 resurrection on the first day inaugurates what Genesis began',
+  sources: 'Kline, Kingdom Prologue; Vos, Biblical Theology; Bavinck, Reformed Dogmatics vol. 4',
+  conns: ['S3', 'T6', 'C1', 'S9'],
+  threads: ['thirdday']
+},
+// ── COVENANTAL ──
+{
+  id: 'C1', cat: 'Covenantal',
+  title: 'The First Promise, Spoken to the Serpent',
+  desc: 'Before the humans even receive their consequences, God speaks to the serpent: one descendant of the woman will crush its head. The entire Bible grows from this seed.',
+  date: '~4000 BC', year: -4000,
+  whoa: `Immediately after the fall \u2014 before the humans even receive their consequences \u2014 God speaks to the serpent and makes the first promise of redemption in all of Scripture. One specific descendant of the woman will crush the serpent\u2019s head, though the serpent will wound his heel. This single verse is the seed from which the entire biblical narrative grows. The phrasing "seed of the woman" is unusual \u2014 in the ancient world, offspring was traced through the father \u2014 which may be the earliest hint of the virgin birth.`,
+  otRef: 'Genesis 3:15',
+  ot: `"I will put enmity between you and the woman, and between your [A:offspring] and [B:her offspring]; [C:he shall bruise your head], and [D:you shall bruise his heel]."`,
+  nt: `"But when the fullness of time had come, God sent forth his Son, [B:born of woman]."\n\u2014 Galatians 4:4\n\n"The God of peace will soon [C:crush Satan under your feet]."\n\u2014 Romans 16:20\n\n"And the great dragon was thrown down, that [A:ancient serpent], who is called the devil and Satan... And they have conquered him by the [D:blood of the Lamb]."\n\u2014 Revelation 12:9, 11`,
+  hlKey: '[A] Serpent\u2019s offspring vs. woman\u2019s offspring \u2014 the cosmic conflict introduced \u00b7 [B] "Her offspring" / "born of woman" \u2014 unusual phrasing pointing to the virgin birth \u00b7 [C] Head crushed \u2014 the fatal blow to Satan \u00b7 [D] Heel bruised \u2014 the wound costs the deliverer something',
+  sources: 'Vos, Biblical Theology; Robertson, The Christ of the Covenants; Hamilton, God\u2019s Glory in Salvation Through Judgment; Collins, Genesis 1\u20134',
+  conns: ['T3', 'S1', 'P8', 'C2'],
+  threads: ['covenant']
+},
+{
+  id: 'C2', cat: 'Covenantal',
+  title: 'God Walked Through the Pieces Alone',
+  desc: 'In ancient covenant ceremonies, both parties walked through halved animals. But God put Abraham to sleep and walked through alone \u2014 taking the curse on himself.',
+  date: '~2000 BC', year: -2000,
+  whoa: `When God formalizes his covenant with Abraham, the ceremony follows an ancient Near Eastern pattern: animals are cut in half and arranged in two rows. Both parties would walk through \u2014 the implicit oath being "may I become like these animals if I break this covenant." But in Genesis 15, Abraham is put into a deep sleep, and God alone \u2014 represented by a smoking fire pot and a flaming torch \u2014 passes between the pieces. God takes the covenant curse entirely on himself.`,
+  otRef: 'Genesis 15:9\u201312, 17\u201318 (~2000 BC)',
+  ot: `"He said to him, \u2018Bring me a heifer three years old, a female goat three years old, a ram three years old, a turtledove, and a young pigeon.\u2019 And he brought him all these, [A:cut them in half], and laid each half over against the other..."\n\n"As the sun was going down, a [B:deep sleep] fell on Abram... When the sun had gone down and it was dark, behold, a [C:smoking fire pot and a flaming torch] [D:passed between these pieces]. On that day the LORD made a covenant with Abram."\n\n"In you [E:all the families of the earth shall be blessed]." \u2014 Genesis 12:3`,
+  nt: `"And the Scripture, foreseeing that God would justify the [E:Gentiles by faith], preached the gospel beforehand to Abraham, saying, \u2018In you shall [E:all the nations be blessed].\u2019"\n\u2014 Galatians 3:8\n\n"Christ [D:redeemed us from the curse of the law by becoming a curse for us]."\n\u2014 Galatians 3:13`,
+  hlKey: '[A] Animals cut in half \u2014 the covenant-ratification ritual \u00b7 [B] Abraham asleep \u2014 he doesn\u2019t walk through; he\u2019s a passive recipient \u00b7 [C] Fire and torch \u2014 God\u2019s presence \u00b7 [D] God passes through alone \u2194 Christ becomes a curse for us \u00b7 [E] All nations blessed \u2014 the universal scope',
+  sources: 'Robertson, The Christ of the Covenants; Kline, Kingdom Prologue; Vos, Biblical Theology; Wright, The Climax of the Covenant',
+  conns: ['T2', 'L6', 'S10', 'C3'],
+  threads: ['covenant']
+},
+{
+  id: 'C3', cat: 'Covenantal',
+  title: 'A System Designed to Say "Not Enough"',
+  desc: 'The sacrificial system had repetition built into its design: every morning, every evening, every year. The repetition was a confession of insufficiency.',
+  date: '~1446 BC', year: -1446,
+  whoa: `The Mosaic law \u2014 the sacrificial system, the purity codes, the tabernacle regulations \u2014 was an elaborate, costly, and beautiful system. But it had a feature built into its design that pointed beyond itself: it had to be repeated. Every morning and every evening, a lamb was sacrificed. Every year, the Day of Atonement cycle restarted. The repetition was not a flaw; it was a confession. Hebrews states it directly: "It is impossible for the blood of bulls and goats to take away sins."`,
+  otRef: 'Leviticus 1:3\u20134; Exodus 29:38\u201339',
+  ot: `"He shall lay his hand on the head of the burnt offering, and it shall be accepted for him [A:to make atonement for him]."\n\n"Now this is what you shall offer on the altar: two lambs a year old [B:day by day regularly]. One lamb you shall offer [B:in the morning], and the other lamb you shall offer [B:at twilight]."`,
+  nt: `"For since the law has but a [C:shadow of the good things to come] instead of the true form of these realities, it can [D:never], by the same sacrifices that are [B:continually offered every year], make perfect those who draw near."\n\u2014 Hebrews 10:1\n\n"For it is [D:impossible for the blood of bulls and goats to take away sins]."\n\u2014 Hebrews 10:4\n\n"So then, the law was our [E:guardian] until Christ came, in order that we might be justified by faith."\n\u2014 Galatians 3:24\n\n"For Christ is the [F:end (telos)] of the law for righteousness to everyone who believes."\n\u2014 Romans 10:4`,
+  hlKey: '[A] Atonement through sacrifice \u2014 the mechanism \u00b7 [B] Daily / continually / every year \u2014 the repetition that reveals insufficiency \u00b7 [C] Shadow \u2014 the law is explicitly called a shadow of the reality \u00b7 [D] "Never" / "impossible" \u2014 the system\u2019s own admission \u00b7 [E] Guardian / tutor \u2014 the law\u2019s pedagogical function \u00b7 [F] Telos \u2014 both "end" and "goal"',
+  sources: 'Kline, Treaty of the Great King; Robertson, The Christ of the Covenants; Vos, Biblical Theology',
+  conns: ['T1', 'L1', 'C6', 'P10'],
+  threads: ['covenant', 'substitution', 'lamb']
+},
+{
+  id: 'C4', cat: 'Covenantal',
+  title: 'The War Bow Points at God',
+  desc: 'The Hebrew word for rainbow is the same as "war bow." God places his weapon in the sky pointed upward \u2014 at himself. A disarmament image.',
+  date: '~3000 BC', year: -3000,
+  whoa: `After the flood, God makes a covenant with all creation \u2014 the broadest covenant in Scripture. The sign is the rainbow. But the Hebrew word for rainbow (qesheth) is the same word used for a war bow. God places his war bow in the sky \u2014 pointed upward, toward himself, not downward at the earth. The covenant sign itself is a disarmament image. God absorbs his own judgment rather than directing it at creation.`,
+  otRef: 'Genesis 9:12\u201315',
+  ot: `"And God said, \u2018This is the sign of the covenant that I make between me and you and every living creature... I have set my [A:bow] in the cloud, and it shall be a sign of the covenant between me and the earth. When I bring clouds over the earth and the [A:bow] is seen in the clouds, I will [B:remember my covenant]... and the waters shall [B:never again become a flood to destroy all flesh].\u2019"`,
+  nt: `"...God\u2019s patience waited in the days of Noah, while the ark was being prepared, in which a few, that is, eight persons, were brought safely through [C:water]. [C:Baptism, which corresponds to this], now saves you."\n\u2014 1 Peter 3:20\u201321`,
+  hlKey: '[A] Bow (qesheth) \u2014 war bow placed in the sky, pointed at God \u00b7 [B] "Never again" / remember \u2014 God\u2019s self-binding promise \u00b7 [C] Water that judges and saves \u2014 the flood as a type of baptism',
+  sources: 'Kline, Kingdom Prologue; Robertson, The Christ of the Covenants; Vos, Biblical Theology',
+  conns: ['S7', 'C1', 'S6'],
+  threads: ['covenant']
+},
+{
+  id: 'C5', cat: 'Covenantal',
+  title: '600 Years with No King \u2014 Then an Angel',
+  desc: 'God promised David an everlasting throne. Then the dynasty collapsed for 600 years. Then an angel told a teenager her son would receive "the throne of his father David."',
+  date: '~1000 BC', year: -1000,
+  whoa: `God promises David an everlasting dynasty: "Your throne shall be established forever." Then the dynasty collapses with the Babylonian exile in 586 BC. For roughly 600 years, there is no king on David\u2019s throne. Then an angel appears to a teenager in Nazareth and announces that her son will receive "the throne of his father David" and reign over a kingdom that "will have no end." And in Revelation, Jesus identifies himself: "I am the root AND the descendant of David" \u2014 both the source and the offspring.`,
+  otRef: '2 Samuel 7:12\u201313, 16; Isaiah 9:6\u20137',
+  ot: `"I will raise up your offspring after you... and I will establish the throne of his [A:kingdom forever]."\n\n"Your [A:throne] shall be established forever."\n\n"Of the increase of his government and of peace there will be [B:no end], on the [A:throne of David] and over his kingdom."`,
+  nt: `"The Lord God will give to him the [A:throne of his father David], and he will reign over the house of Jacob forever, and of his [A:kingdom] there will be [B:no end]."\n\u2014 Luke 1:32\u201333\n\n"[C:I am the root and the descendant of David], the bright morning star."\n\u2014 Revelation 22:16`,
+  hlKey: '[A] Throne / kingdom \u2014 promised to David, announced to Mary, claimed by Jesus \u00b7 [B] "No end" / "forever" \u2014 the same language in Isaiah and Luke \u00b7 [C] "Root AND descendant" \u2014 Jesus is both before David and after David, breaking linear time',
+  sources: 'Robertson, The Christ of the Covenants; Dempster, Dominion and Dynasty; Vos, Biblical Theology',
+  conns: ['P1', 'P4', 'T10', 'L6'],
+  threads: ['covenant']
+},
+{
+  id: 'C6', cat: 'Covenantal',
+  title: 'Jesus Quotes Jeremiah Mid-Meal',
+  desc: 'Jeremiah promised a "new covenant" \u2014 law on hearts, sins remembered no more. At the Last Supper, Jesus lifts a cup and says: "This cup is the new covenant in my blood."',
+  date: '~600 BC', year: -600,
+  whoa: `Jeremiah prophesied during the darkest period of Israel\u2019s history \u2014 the destruction of Jerusalem and the Babylonian exile. In the midst of catastrophe, he announced something unprecedented: a new covenant, different from the one made at Sinai, in which God would write his law on people\u2019s hearts and "remember their sins no more." Six centuries later, at the Last Supper, Jesus lifts a cup of wine and says: "This cup is the new covenant in my blood." The phrase "new covenant" is a direct citation of Jeremiah 31.`,
+  otRef: 'Jeremiah 31:31\u201334 (~600 BC)',
+  ot: `"Behold, the days are coming, declares the LORD, when I will make a [A:new covenant] with the house of Israel and the house of Judah, not like the covenant that I made with their fathers... For this is the covenant that I will make: [B:I will put my law within them, and I will write it on their hearts]... For [C:I will forgive their iniquity, and I will remember their sins no more]."`,
+  nt: `"And likewise the cup after supper, saying, \u2018This cup is the [A:new covenant in my blood].\u2019"\n\u2014 Luke 22:20\n\n"In speaking of a [A:new covenant], he makes the first one obsolete."\n\u2014 Hebrews 8:13\n\n"And the Holy Spirit also bears witness to us; for after saying, \u2018This is the covenant that I will make with them after those days, declares the Lord: [B:I will put my laws on their hearts, and write them on their minds],\u2019 then he adds, \u2018[C:I will remember their sins and their lawless deeds no more].\u2019"\n\u2014 Hebrews 10:15\u201317`,
+  hlKey: '[A] New covenant \u2014 Jeremiah\u2019s term, directly cited by Jesus at the Last Supper \u00b7 [B] Law on hearts \u2014 internal transformation the Mosaic covenant couldn\u2019t provide \u00b7 [C] Sins remembered no more \u2014 complete, permanent forgiveness',
+  sources: 'Robertson, The Christ of the Covenants; Vos, Biblical Theology; Kline, Treaty of the Great King; Dumbrell, Covenant and Creation',
+  conns: ['L1', 'C1', 'P2', 'L3'],
+  threads: ['covenant']
+},
+// ── STRUCTURAL ──
+{
+  id: 'S1', cat: 'Structural',
+  title: 'Barren, Barren, Barren, Barren... Virgin',
+  desc: 'The Messiah\u2019s line passes through women who cannot conceive \u2014 and the impossibility escalates each generation until it reaches a virgin.',
+  date: '~2000 BC', year: -2000,
+  whoa: `The line through which the Messiah comes repeatedly passes through women who cannot conceive \u2014 and the degree of impossibility increases with each generation. The pattern teaches a theological principle: the seed-line is sustained by divine initiative, not human capability. The escalation from "unlikely" to "impossible" to "unprecedented" culminates in a conception with no human father at all.`,
+  otRef: null,
+  ot: `Sarah \u2014 old age (Genesis 18:11) \u2192 Isaac\nRebekah \u2014 barren (Genesis 25:21) \u2192 Jacob\nRachel \u2014 barren (Genesis 29:31) \u2192 Joseph\nManoah\u2019s wife \u2014 barren (Judges 13:2) \u2192 Samson\nHannah \u2014 barren (1 Samuel 1:2) \u2192 Samuel\nElizabeth \u2014 old age + barren (Luke 1:7) \u2192 John the Baptist\nMary \u2014 virgin (Luke 1:34) \u2192 Jesus`,
+  nt: `"But to all who did receive him, who believed in his name, he gave the right to become children of God, who were born, not of blood nor of the will of the flesh nor of the will of man, but of God."\n\u2014 John 1:12\u201313`,
+  hlKey: '',
+  sources: 'Vos, Biblical Theology; Clowney, The Unfolding Mystery; Hamilton, God\u2019s Glory in Salvation Through Judgment',
+  conns: ['P8', 'C1', 'C2'],
+  threads: []
+},
+{
+  id: 'S2', cat: 'Structural',
+  title: 'From Abel\u2019s Lamb to the Lamb on the Throne',
+  desc: 'The lamb is the single most sustained image in the Bible \u2014 from Genesis 3 to Revelation 22. Lambs multiply until replaced by one Lamb.',
+  date: '~4000 BC', year: -4000,
+  whoa: `The lamb is arguably the single most sustained image in the entire Bible, appearing from the third chapter of Genesis to the final chapter of Revelation. Tracing it in sequence reveals a trajectory: the lambs begin as individual substitutes, multiply into a daily institutional practice, then converge back into a single Lamb who replaces the entire system.`,
+  otRef: null,
+  ot: `God kills an animal to clothe the guilty humans \u2014 Genesis 3:21\nAbel offers a lamb and is accepted \u2014 Genesis 4:4\nAbraham: "God will provide for himself the lamb" \u2014 Genesis 22:8\nThe Passover lamb\u2019s blood saves from death \u2014 Exodus 12\nDaily temple lambs, morning and evening \u2014 Exodus 29:38\u201342\nIsaiah: "like a lamb that is led to the slaughter" \u2014 Isaiah 53:7`,
+  nt: `John the Baptist: "Behold, the Lamb of God" \u2014 John 1:29\nPaul: "Christ, our Passover lamb, has been sacrificed" \u2014 1 Corinthians 5:7\nRevelation: the Lamb appears 28 times \u2014 slain but standing, on the throne, opening the scroll of history \u2014 Revelation 5\u201322`,
+  hlKey: '',
+  sources: 'Morales, Who Shall Ascend the Mountain of the Lord?; Beale, The Book of Revelation (NIGTC)',
+  conns: ['T1', 'T2', 'P2', 'C1'],
+  threads: ['lamb']
+},
+{
+  id: 'S3', cat: 'Structural',
+  title: 'Why "Third Day" Appears Everywhere',
+  desc: 'The third day is the day of resolution throughout the OT \u2014 too consistent to be coincidental. Paul says Christ rose "on the third day according to the Scriptures" (plural).',
+  date: '~2000 BC', year: -2000,
+  whoa: `The third day functions throughout the Old Testament as the day of resolution, deliverance, and new beginning. The pattern appears across different books, genres, and centuries \u2014 too consistently to be coincidental, yet without any single OT verse explicitly stating "the Messiah will rise on the third day." When Paul says Christ was raised "on the third day according to the Scriptures" (plural), he may be pointing not to one prophecy but to this pervasive pattern.`,
+  otRef: null,
+  ot: `Abraham sees Mount Moriah on the third day \u2014 Genesis 22:4\nJoseph releases his brothers from prison on the third day \u2014 Genesis 42:18\nIsrael is to consecrate themselves to meet God on the third day at Sinai \u2014 Exodus 19:11\nJonah in the fish three days \u2014 Jonah 1:17\nHosea: "On the third day he will raise us up" \u2014 Hosea 6:2\nEsther approaches the king on the third day \u2014 Esther 5:1`,
+  nt: `"He was raised on the third day in accordance with the Scriptures."\n\u2014 1 Corinthians 15:4\n\nThe plural "Scriptures" \u2014 not "Scripture" \u2014 suggests Paul is pointing to a pattern across multiple texts rather than a single proof-text.`,
+  hlKey: '',
+  sources: 'Beale, A New Testament Biblical Theology; Hamilton, God\u2019s Glory in Salvation Through Judgment; Wright, Resurrection of the Son of God',
+  conns: ['T2', 'T11', 'L2', 'L7', 'H1'],
+  threads: ['thirdday']
+},
+{
+  id: 'S4', cat: 'Structural',
+  title: 'Every Mountain Is the Same Meeting',
+  desc: 'Mountains are consistently where God meets humanity: Ararat, Moriah, Sinai, Carmel, Transfiguration, Golgotha, Olivet. Each builds on the last.',
+  date: '~2500 BC', year: -2500,
+  whoa: `Throughout Scripture, mountains are consistently the places where God meets humanity, gives revelation, and accomplishes salvation. The pattern creates a geographic thread \u2014 each mountain encounter builds on the previous ones, and the prophets envision a final mountain where all nations gather.`,
+  otRef: null,
+  ot: `Ararat \u2014 new beginning after judgment (Gen 8)\nMoriah \u2014 sacrifice and provision (Gen 22)\nSinai \u2014 law given, covenant made (Exod 19\u201324)\nCarmel \u2014 true God vs. false gods (1 Kings 18)\n\n"It shall come to pass in the latter days that the mountain of the house of the LORD shall be established as the highest of the mountains... and all the nations shall flow to it." \u2014 Isaiah 2:2`,
+  nt: `Mount of Beatitudes \u2014 new law from a new Moses (Matt 5\u20137)\nMount of Transfiguration \u2014 glory revealed, Moses and Elijah appear (Matt 17)\nGolgotha \u2014 sacrifice completed (Matt 27)\nMount of Olives \u2014 ascension and promised return (Acts 1)`,
+  hlKey: '',
+  sources: 'Morales, Who Shall Ascend the Mountain of the Lord?; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['G1', 'G4', 'P10', 'T7'],
+  threads: ['access']
+},
+{
+  id: 'S5', cat: 'Structural',
+  title: 'He Arranged the Donkey, the Room, and the Cup',
+  desc: 'Jesus doesn\u2019t stumble into prophecy \u2014 he actively orchestrates fulfillment. The donkey, the upper room, the Psalm 22 citation: all deliberate.',
+  date: '~30 AD', year: 30,
+  whoa: `One of the most underappreciated aspects of the Gospel narratives is the degree to which Jesus actively orchestrates prophetic fulfillment rather than passively experiencing it. He doesn\u2019t stumble into prophecy \u2014 he arranges the logistics. This pattern of deliberate enactment implies either profound prophetic self-awareness or an extraordinarily detailed level of later fabrication.`,
+  otRef: null,
+  ot: `Sends for a specific donkey from a specific village \u2014 Matthew 21:1\u20133 (fulfilling Zechariah 9:9)\nTimes his arrival in Jerusalem to Passover week\nTells disciples where to find the upper room \u2014 Mark 14:13\u201315\nInstitutes the Supper as Passover + covenant ceremony + Jeremiah 31 citation simultaneously\nQuotes Psalm 22:1 from the cross\nSays "I thirst" (John 19:28) "to fulfill the Scripture" \u2192 receives sour wine (Psalm 69:21)\nPredicts his own death and resurrection three times (Mark 8:31, 9:31, 10:33\u201334)`,
+  nt: `Wright argues in Jesus and the Victory of God that these were deliberate prophetic actions (\u014dth) \u2014 symbolic public acts in the tradition of OT prophets like Jeremiah breaking a pot or Ezekiel lying on his side.`,
+  hlKey: '',
+  sources: 'Wright, Jesus and the Victory of God; Bauckham, Jesus and the Eyewitnesses; France, Matthew (NICNT)',
+  conns: ['P4', 'P5', 'L1', 'S11', 'H5'],
+  threads: []
+},
+{
+  id: 'S6', cat: 'Structural',
+  title: '"Something Greater Than the Temple Is Here"',
+  desc: 'Jesus makes explicit claims to surpass every major institution and figure: the temple, Jonah, Solomon, Moses. The antitype is always "more."',
+  date: '~30 AD', year: 30,
+  whoa: `Jesus makes a series of explicit claims that he surpasses every major institution and figure in Israel\u2019s history. These aren\u2019t subtle implications \u2014 they\u2019re direct statements, usually made to people who would understand the weight of what he\u2019s claiming. Every type is surpassed. Vos calls this the "organic" growth of revelation: the seed contains the tree, but the tree is always more.`,
+  otRef: null,
+  ot: `"I tell you, something greater than the temple is here." \u2014 Matthew 12:6\n"Something greater than Jonah is here." \u2014 Matthew 12:41\n"Something greater than Solomon is here." \u2014 Matthew 12:42`,
+  nt: `"Jesus has been counted worthy of more glory than Moses." \u2014 Hebrews 3:3\n\n"If perfection had been attainable through the Levitical priesthood... what further need would there have been for another priest to arise after the order of Melchizedek, rather than one named after the order of Aaron?" \u2014 Hebrews 7:11`,
+  hlKey: '',
+  sources: 'Vos, Biblical Theology; Beale, A New Testament Biblical Theology; Clowney, The Unfolding Mystery',
+  conns: ['T1', 'T7', 'T11', 'P10', 'L6'],
+  threads: []
+},
+{
+  id: 'S7', cat: 'Structural',
+  title: 'Water and Blood from One Wound',
+  desc: 'John stresses that he personally witnessed blood and water from Jesus\u2019 pierced side. Water for purification, blood for atonement \u2014 both from one wound.',
+  date: '~30 AD', year: 30,
+  whoa: `John records that when a soldier pierced Jesus\u2019 side, "at once there came out blood and water" \u2014 and he pauses the narrative to stress that he personally witnessed this. Water and blood correspond to the two great ritual systems of the Old Testament: water for purification and blood for atonement. Both flow from a single wound. The parallel extends further: Adam\u2019s side was opened and Eve (the bride) came forth; Christ\u2019s side is opened and the church (the bride) comes forth.`,
+  otRef: null,
+  ot: `Adam\u2019s side opened \u2192 Eve (the bride) \u2014 Genesis 2:21\u201322\nThe rock struck \u2192 water flows \u2014 Exodus 17:6\nEzekiel\u2019s temple \u2192 river flows from its side, bringing life \u2014 Ezekiel 47:1\u20139`,
+  nt: `"But one of the soldiers pierced his side with a spear, and at once there came out blood and water. He who saw it has borne witness \u2014 his testimony is true, and he knows that he is telling the truth \u2014 that you also may believe."\n\u2014 John 19:34\u201335`,
+  hlKey: '',
+  sources: 'Carson, The Gospel According to John; Beale, The Temple and the Church\u2019s Mission; Calvin, Commentary on John',
+  conns: ['T8', 'P6', 'T7', 'C6'],
+  threads: ['piercing']
+},
+{
+  id: 'S8', cat: 'Structural',
+  title: 'Three Items. Three Fulfillments.',
+  desc: 'The Ark of the Covenant held three items. Each represented an Israel failure that Christ fulfills: the law, the manna, and the priestly rod.',
+  date: '~1446 BC', year: -1446,
+  whoa: `The Ark of the Covenant \u2014 God\u2019s throne on earth, housed in the Holy of Holies \u2014 contained exactly three items. Each item represented a failure of Israel that God transformed into a memorial of provision. And each item finds its fulfillment in a different aspect of Christ\u2019s work.`,
+  otRef: null,
+  ot: `Tablets of the Law (Exodus 25:16) \u2014 Israel broke the law\nJar of Manna (Exodus 16:33) \u2014 Israel complained about the bread\nAaron\u2019s Rod That Budded (Numbers 17:10) \u2014 Israel challenged the priesthood`,
+  nt: `"Do not think that I have come to abolish the Law... I have not come to abolish them but to fulfill them." \u2014 Matthew 5:17\n\n"I am the bread of life; whoever comes to me shall not hunger." \u2014 John 6:35\n\n"[Christ was] designated a high priest... by the power of an indestructible life." \u2014 Hebrews 7:15\u201316`,
+  hlKey: '',
+  sources: 'Morales, Who Shall Ascend the Mountain of the Lord?; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['T6', 'L6', 'C3', 'T7'],
+  threads: []
+},
+{
+  id: 'S9', cat: 'Structural',
+  title: 'Garden Opens the Bible. Garden-City Closes It.',
+  desc: 'Genesis opens with a garden: tree of life, river, God dwelling with man. Revelation closes with a garden-city: same elements, expanded to cosmic scale.',
+  date: '~4000 BC', year: -4000,
+  whoa: `The Bible\u2019s opening and closing scenes share the same elements \u2014 tree of life, river, God dwelling with humanity, absence of death \u2014 but the ending surpasses the beginning. What was a garden becomes a garden-city. What sustained two people now heals the nations. What was localized fills everything. Everything between Genesis 2 and Revelation 22 is the story of how God gets from one to the other.`,
+  otRef: null,
+  ot: `"And the LORD God planted a [A:garden] in Eden... The [B:tree of life] was in the midst of the garden... A [C:river] flowed out of Eden to water the garden." \u2014 Genesis 2:8\u201310`,
+  nt: `"Then the angel showed me the [C:river of the water of life], bright as crystal, flowing from the throne of God and of the Lamb... On either side of the river, the [B:tree of life] with its twelve kinds of fruit... and the leaves of the tree were for the [D:healing of the nations]."\n\n"Behold, the [E:dwelling place of God is with man]. He will [E:dwell with them]... He will wipe away every [F:tear] from their eyes, and [F:death shall be no more]."\n\n"And I saw [G:no temple in the city], for its temple is the Lord God the Almighty and the Lamb."\n\u2014 Revelation 21\u201322`,
+  hlKey: '[A] Garden \u2192 Garden-city \u00b7 [B] Tree of life \u2014 present in both, expanded \u00b7 [C] River \u2014 same image, expanded \u00b7 [D] Healing of the nations \u2014 scope expands from two to all \u00b7 [E] God dwelling with humanity \u00b7 [F] No death \u2014 the reversal of Genesis 3 \u00b7 [G] No temple \u2014 God\u2019s presence fills all reality',
+  sources: 'Beale, The Temple and the Church\u2019s Mission; Beale, A New Testament Biblical Theology; Kline, Kingdom Prologue',
+  conns: ['T7', 'C1', 'L7', 'L1'],
+  threads: []
+},
+{
+  id: 'S10', cat: 'Structural',
+  title: 'Outsiders Keep Showing Up in the Lineage',
+  desc: 'The Messiah\u2019s bloodline includes a Canaanite prostitute, a Moabite, and "the wife of Uriah." Matthew names them all. Grace was never ethno-exclusive.',
+  date: '~2000 BC', year: -2000,
+  whoa: `God\u2019s promise to Abraham \u2014 "in you all the families of the earth shall be blessed" \u2014 doesn\u2019t wait until the New Testament to begin unfolding. Throughout the Old Testament, outsiders are persistently woven into the narrative at critical moments, often in the Messiah\u2019s own lineage. Matthew\u2019s genealogy of Jesus makes this impossible to miss by naming four women, three of whom are clearly outsiders.`,
+  otRef: null,
+  ot: `Rahab \u2014 Canaanite prostitute (Joshua 2) \u2192 in Jesus\u2019 genealogy\nRuth \u2014 Moabite, excluded by Deuteronomy 23:3 \u2192 in Jesus\u2019 genealogy\nTamar \u2014 plays the role of a prostitute (Genesis 38) \u2192 in Jesus\u2019 genealogy\nBathsheba \u2014 "the wife of Uriah" the Hittite \u2192 in Jesus\u2019 genealogy\nNaaman \u2014 Syrian commander healed (2 Kings 5)\nThe widow of Zarephath \u2014 Sidonian woman sustained by Elijah (1 Kings 17)\nNineveh \u2014 a Gentile city repents at Jonah\u2019s preaching (Jonah 3)`,
+  nt: `"Go therefore and make disciples of all nations."\n\u2014 Matthew 28:19\n\n"There is neither Jew nor Greek, there is neither slave nor free, there is no male and female, for you are all one in Christ Jesus. And if you are Christ\u2019s, then you are Abraham\u2019s offspring, heirs according to promise."\n\u2014 Galatians 3:28\u201329`,
+  hlKey: '',
+  sources: 'Wright, The Climax of the Covenant; Beale, A New Testament Biblical Theology; Robertson, The Christ of the Covenants',
+  conns: ['C2', 'T10', 'T11', 'T12'],
+  threads: []
+},
+{
+  id: 'S11', cat: 'Structural',
+  title: 'Why Invent Women as Your Star Witnesses?',
+  desc: 'In a culture where women\u2019s testimony was inadmissible in court, all four Gospels place women as the first witnesses to the empty tomb.',
+  date: '~30 AD', year: 30,
+  whoa: `If the Gospel writers fabricated the resurrection narrative, they made a series of choices that would actively undermine their credibility in their own cultural context. In first-century Jewish society, women\u2019s testimony was not accepted in legal proceedings. Yet all four Gospels \u2014 independently \u2014 place women as the first and primary witnesses to the empty tomb. Beyond this, the Gospels include multiple details that embarrass the heroes of the story: Peter denies Jesus three times, the disciples fall asleep when asked to pray, Thomas refuses to believe.`,
+  otRef: null,
+  ot: ``,
+  nt: `"Now it was Mary Magdalene and Joanna and Mary the mother of James and the other women with them who told these things to the apostles, but these words seemed to them an idle tale, and they did not believe them."\n\u2014 Luke 24:10\u201311\n\nEven within the narrative, the male disciples don\u2019t believe the women\u2019s report \u2014 another detail that fabricators would be unlikely to include.`,
+  hlKey: '',
+  sources: 'Bauckham, Jesus and the Eyewitnesses; Licona, The Resurrection of Jesus; Wright, Resurrection of the Son of God; Bruce, New Testament Documents',
+  conns: ['S5', 'H1', 'H4', 'H5'],
+  threads: []
+},
+// ── GEOGRAPHIC ──
+{
+  id: 'G1', cat: 'Geographic',
+  title: '"On This Mountain It Shall Be Provided"',
+  desc: 'Abraham named Moriah "The LORD will provide" \u2014 in future tense. Solomon built the temple there. Golgotha sits on the same ridge.',
+  date: '~2000 BC', year: -2000,
+  whoa: `When Abraham names the place where he almost sacrificed Isaac, he uses a phrase in future tense: "On the mount of the LORD it shall be provided." 2 Chronicles 3:1 identifies Mount Moriah as the location where Solomon built the temple. Christian tradition places Golgotha on the same ridge. Three pivotal events converge on one geographic location: the near-sacrifice of Abraham\u2019s son, the temple where sacrifices were offered daily, and the crucifixion where the final sacrifice was made.`,
+  otRef: 'Genesis 22:2, 14; 2 Chronicles 3:1',
+  ot: `"Go to the land of [A:Moriah], and offer him there as a burnt offering on one of the mountains."\n\n"So Abraham called the name of that place, \u2018The LORD will provide\u2019; as it is said to this day, \u2018[B:On the mount of the LORD it shall be provided].\u2019"\n\n"Then Solomon began to build the house of the LORD in Jerusalem on [A:Mount Moriah]."`,
+  nt: ``,
+  hlKey: '[A] Moriah \u2014 the same location named for Abraham\u2019s sacrifice and Solomon\u2019s temple \u00b7 [B] Future tense \u2014 "it SHALL be provided" points beyond the immediate event',
+  sources: 'Morales, Who Shall Ascend; Levenson, The Death and Resurrection of the Beloved Son; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['T2', 'T7', 'S4'],
+  threads: ['access']
+},
+{
+  id: 'G2', cat: 'Geographic',
+  title: 'The Bread of Life Born in the House of Bread',
+  desc: 'Bethlehem means "house of bread." Ruth met Boaz there during grain harvest. David was anointed there. The Bread of Life was born there.',
+  date: '~1100 BC', year: -1100,
+  whoa: `The Hebrew name Bethlehem (beth lehem) literally means "house of bread." This is where Ruth met Boaz \u2014 the kinsman-redeemer \u2014 during the grain harvest. This is where David, the shepherd-king, was born and anointed. And this is where the one who calls himself "the bread of life" is born. The town\u2019s name, its associations, and its prophetic role converge.`,
+  otRef: null,
+  ot: `"Beth lehem" = "house of bread" (Hebrew etymology)\n"A voice was heard in Ramah, weeping and loud lamentation, Rachel weeping for her children." \u2014 Jeremiah 31:15 \u2192 Matthew 2:18\n"The LORD said to Samuel... \u2018I will send you to Jesse the Bethlehemite, for I have provided for myself a king among his sons.\u2019" \u2014 1 Samuel 16:1`,
+  nt: `"I am the bread of life; whoever comes to me shall not hunger."\n\u2014 John 6:35`,
+  hlKey: '',
+  sources: 'Robertson, The Christ of the Prophets; Clowney, The Unfolding Mystery',
+  conns: ['P1', 'T10', 'T6', 'L5', 'C5'],
+  threads: []
+},
+{
+  id: 'G3', cat: 'Geographic',
+  title: 'The Holiest One Goes to the Unclean Place',
+  desc: 'In the Levitical system, "outside the camp" was where uncleanness went. Golgotha was outside the walls. Jesus went to the place of maximum contamination.',
+  date: '~30 AD', year: 30,
+  whoa: `In the Levitical system, "outside the camp" was where uncleanness went: lepers, those contaminated by contact with death, and the scapegoat bearing the people\u2019s sins. Golgotha was located outside the walls of Jerusalem. Hebrews makes the theological connection explicit: Jesus went to the place of maximum uncleanness so that the unclean could enter the place of maximum holiness.`,
+  otRef: 'Leviticus 4:12; 13:46',
+  ot: `"He shall carry the whole bull [A:outside the camp] to a clean place... and shall [A:burn it]."\n\n"He is unclean. He shall live alone. His dwelling shall be [A:outside the camp]."`,
+  nt: `"So Jesus also suffered [A:outside the gate] in order to [B:sanctify the people through his own blood]. Therefore let us go to him [A:outside the camp] and bear the reproach he endured."\n\u2014 Hebrews 13:12\u201313`,
+  hlKey: '[A] Outside the camp/gate \u2014 the location of uncleanness, where Jesus goes \u00b7 [B] Sanctify \u2014 the holiest one goes to the unclean place to make the unclean holy',
+  sources: 'Morales, Who Shall Ascend; Lane, Hebrews (WBC)',
+  conns: ['L4', 'T4', 'L3', 'P2'],
+  threads: ['access']
+},
+{
+  id: 'G4', cat: 'Geographic',
+  title: 'Departure Point. Return Point. Same Mountain.',
+  desc: 'The Mount of Olives: triumphal entry, Gethsemane, Olivet Discourse, ascension. The angels say he will return "in the same way" \u2014 to the same mountain.',
+  date: '~520 BC', year: -520,
+  whoa: `The Mount of Olives functions as a prophetic axis point in the narrative. Zechariah prophesied that the LORD\u2019s feet would stand on the Mount of Olives. Jesus enters Jerusalem from there, prays at Gethsemane at its base, delivers the Olivet Discourse from its summit, and ascends to heaven from its peak. The angels at the ascension say he will return "in the same way."`,
+  otRef: 'Zechariah 14:4',
+  ot: `"On that day his [A:feet] shall stand on the [B:Mount of Olives] that lies before Jerusalem on the east."`,
+  nt: `"And when he had said these things, as they were looking on, he was [C:lifted up], and a cloud took him out of their sight... \u2018This Jesus, who was taken up from you into heaven, will [C:come in the same way as you saw him go into heaven].\u2019 Then they returned to Jerusalem from the mount called [B:Olivet]."\n\u2014 Acts 1:9\u201312`,
+  hlKey: '[A] Feet standing \u2014 physical, bodily presence on this specific mountain \u00b7 [B] Mount of Olives \u2014 the geographic location named in both texts \u00b7 [C] Going and returning \u2014 departure and promised return, same location',
+  sources: 'Wright, Jesus and the Victory of God; Beale, The Temple and the Church\u2019s Mission',
+  conns: ['P4', 'S5', 'S9'],
+  threads: []
+},
+{
+  id: 'G5', cat: 'Geographic',
+  title: 'Luke Calls the Cross an "Exodus"',
+  desc: 'At the Transfiguration, Moses and Elijah speak with Jesus about his "exodus" \u2014 Luke uses the actual Greek word exodos for the cross.',
+  date: '~1446 BC', year: -1446,
+  whoa: `Egypt functions throughout Scripture as the archetypical place of bondage. When Luke describes the Transfiguration, he records that Moses and Elijah spoke with Jesus about his "exodus" \u2014 using the actual Greek word exodos \u2014 which he would accomplish in Jerusalem. Luke deliberately uses the Exodus word for the cross. Jesus\u2019 death is the new exodus: deliverance from a bondage deeper than Egypt\u2019s.`,
+  otRef: 'Deuteronomy 4:20',
+  ot: `"But the LORD has taken you and brought you out of the [A:iron furnace, out of Egypt], to be a people of his own inheritance."`,
+  nt: `"And behold, two men were talking with him, Moses and Elijah, who appeared in glory and spoke of his [B:departure (exodon \u2014 \u2018exodus\u2019)], which he was about to accomplish at Jerusalem."\n\u2014 Luke 9:30\u201331`,
+  hlKey: '[A] Egypt / iron furnace \u2014 the place of bondage \u00b7 [B] Exodos \u2014 Luke\u2019s word for the cross. Not "death," not "suffering" \u2014 exodus. Deliverance.',
+  sources: 'Vos, Biblical Theology; Wright, The Climax of the Covenant',
+  conns: ['P9', 'T9', 'C3', 'T1'],
+  threads: []
+},
+// ── HISTORICAL ──
+{
+  id: 'H1', cat: 'Historical',
+  title: 'Too Early for Legend',
+  desc: 'The creed in 1 Corinthians 15 dates to within 2\u20135 years of the crucifixion \u2014 too early for legend to develop. Even atheist scholars agree on the dating.',
+  date: '~30 AD', year: 30,
+  whoa: `In 1 Corinthians 15:3\u20137, Paul records a creed using the technical rabbinic terms "received" and "delivered," indicating formal tradition that predates his letter. Scholars across the theological spectrum \u2014 including atheist Gerd L\u00fcdemann \u2014 date this creed\u2019s origin to within roughly 2\u20135 years of the crucifixion. This matters because legends require generational distance to develop. But this creed was circulating while the people it names were alive. Paul even adds: "most of the five hundred are still alive" \u2014 an explicit invitation to verify.`,
+  otRef: null,
+  ot: ``,
+  nt: `"For I delivered to you as of first importance what I also received: that Christ died for our sins in accordance with the Scriptures, that he was buried, that he was raised on the third day in accordance with the Scriptures, and that he appeared to Cephas, then to the twelve. Then he appeared to more than five hundred brothers at one time, most of whom are still alive, though some have fallen asleep. Then he appeared to James, then to all the apostles."\n\u2014 1 Corinthians 15:3\u20137`,
+  hlKey: '',
+  sources: 'Habermas, The Historical Jesus; Licona, The Resurrection of Jesus; Wright, Resurrection of the Son of God; Dunn, Jesus Remembered',
+  conns: ['S11', 'S3', 'P2', 'L2', 'H2', 'H4', 'H5', 'H6'],
+  threads: ['thirdday']
+},
+{
+  id: 'H2', cat: 'Historical',
+  title: 'Even the Enemies Confirm the Facts',
+  desc: 'Tacitus, Josephus, Pliny, the Talmud, Celsus \u2014 hostile sources confirm Jesus existed, was executed under Pilate, and performed acts they attribute to sorcery.',
+  date: '~93 AD', year: 93,
+  whoa: `Multiple non-Christian writers \u2014 some actively hostile to Christianity \u2014 confirm the basic facts of the narrative. What makes these sources significant is precisely their hostility: they have no motive to support Christian claims. Yet even their attacks confirm the underlying events. The enemies dispute the interpretation. They never dispute the events.`,
+  otRef: null,
+  ot: ``,
+  nt: `Tacitus (~AD 116): "Christus" executed under Pontius Pilate during Tiberius\u2019s reign. A "most mischievous superstition" broke out again after his death.\n\nJosephus (~AD 93): Jesus was a teacher condemned by Pilate. Separately refers to "James, the brother of Jesus who was called Christ."\n\nPliny (~AD 112): Christians "sing hymns to Christ as to a god."\n\nBabylonian Talmud (Sanhedrin 43a): "Yeshu" executed on the eve of Passover. Practiced "sorcery" \u2014 doesn\u2019t deny remarkable acts, attributes them differently.\n\nCelsus (~AD 178): Never denies Jesus existed or performed remarkable acts.`,
+  hlKey: '',
+  sources: 'Bruce, NT Documents ch. 10; Tacitus, Annals 15.44; Josephus, Antiquities 18.3.3, 20.9.1; Pliny, Letters 10.96; Talmud, Sanhedrin 43a',
+  conns: ['H1', 'T1', 'S11', 'L2'],
+  threads: []
+},
+{
+  id: 'H3', cat: 'Historical',
+  title: '5,800 Copies vs. Caesar\u2019s 10',
+  desc: 'We have ~5,800 Greek NT manuscripts with a 30-year gap. Caesar\u2019s Gallic War has ~10 copies with a 900-year gap. No one questions Caesar.',
+  date: '~125 AD', year: 125,
+  whoa: `We possess approximately 5,800 Greek manuscripts of the New Testament, plus over 10,000 Latin manuscripts. The earliest fragment dates to roughly AD 125, about 30 years after composition. Compare: Caesar\u2019s Gallic War has about 10 good copies with a 900-year gap. No classical scholar questions Caesar\u2019s reliability based on manuscript evidence. FF Bruce: "If the New Testament were a collection of secular writings, their authenticity would generally be regarded as beyond all doubt."`,
+  otRef: null,
+  ot: ``,
+  nt: `New Testament: ~5,800 Greek + 10,000+ Latin, 30\u2013100 year gap\nCaesar\u2019s Gallic War: ~10 copies, ~900 year gap\nTacitus\u2019s Histories: 2 manuscripts, ~800\u20131,000 year gap\nLivy\u2019s Roman History: ~20 copies, ~400+ year gap\nThucydides\u2019s History: ~8 copies, ~1,300 year gap`,
+  hlKey: '',
+  sources: 'Bruce, NT Documents ch. 2; Metzger, The Text of the New Testament; Kenyon, The Bible and Archaeology',
+  conns: ['H1', 'H2'],
+  threads: []
+},
+{
+  id: 'H4', cat: 'Historical',
+  title: 'Liars Make Poor Martyrs',
+  desc: 'The apostles didn\u2019t die for beliefs passed down to them. They died for something they claimed to have personally witnessed. Not one recanted.',
+  date: '~44 AD', year: 44,
+  whoa: `The apostles occupied a unique epistemic position: they were not dying for beliefs passed down to them. They were dying for something they claimed to have personally witnessed. They knew whether or not they had seen the risen Jesus. They had every incentive to recant: Rome offered pardon to those who denied Christ. Not one of the core witnesses is recorded as recanting. The argument is not "dying proves it\u2019s true." The argument is narrower: dying for a firsthand claim you know to be false is psychologically implausible.`,
+  otRef: null,
+  ot: ``,
+  nt: `James son of Zebedee \u2014 beheaded by Herod Agrippa I (~AD 44): "He killed James the brother of John with the sword." \u2014 Acts 12:2\n\nPeter \u2014 crucified in Rome (~AD 64\u201368): referenced by Clement of Rome, 1 Clement 5 (~AD 96)\n\nPaul \u2014 beheaded in Rome (~AD 64\u201368)\n\nJames the brother of Jesus \u2014 stoned (~AD 62): "He assembled the sanhedrin... and brought before them the brother of Jesus, who was called Christ, whose name was James... and delivered them to be stoned." \u2014 Josephus, Antiquities 20.9.1`,
+  hlKey: '',
+  sources: 'McDowell, Historical Evaluation of the Evidence for the Death of the Apostles as Martyrs; Eusebius, Ecclesiastical History; Clement of Rome, 1 Clement 5; Josephus, Antiquities 20.9.1',
+  conns: ['H1', 'H2', 'S11', 'S5'],
+  threads: []
+},
+{
+  id: 'H5', cat: 'Historical',
+  title: 'A Belief No One Would Invent',
+  desc: 'Individual resurrection in the middle of history had no precedent in Jewish or pagan thought. Several features of early Christian belief are historically inexplicable without an actual event.',
+  date: '~30 AD', year: 30,
+  whoa: `NT Wright identifies several features of early Christian belief about resurrection that have no precedent in either Jewish or pagan thought. The belief didn\u2019t develop gradually; it appeared suddenly with specific features nobody was expecting. Individual resurrection in the middle of history, the unique response to a failed messiah, resurrection becoming the central claim, and specific modifications to the concept \u2014 all inexplicable without an actual event.`,
+  otRef: null,
+  ot: ``,
+  nt: `Wright\u2019s key argument: The empty tomb alone would not produce resurrection belief \u2014 it could be explained as grave robbery. Visions alone would not produce it \u2014 the ancient world classified hallucinations as such. But the empty tomb AND appearances TOGETHER, in a Jewish context where resurrection meant new embodied life, would produce exactly the mutation in belief that we observe historically.`,
+  hlKey: '',
+  sources: 'Wright, Resurrection of the Son of God Part V ch. 13\u201318; Licona, The Resurrection of Jesus ch. 5; Allison, The Resurrection of Jesus',
+  conns: ['H1', 'H4', 'S3', 'L2', 'S11'],
+  threads: []
+},
+{
+  id: 'H6', cat: 'Historical',
+  title: 'What a Jewish Historian Couldn\u2019t Avoid Writing',
+  desc: 'Josephus\u2019s second reference to Jesus \u2014 "the brother of Jesus, who was called Christ" \u2014 is accepted as authentic by virtually all scholars.',
+  date: '~93 AD', year: 93,
+  whoa: `Josephus, a Jewish aristocrat writing for a Roman audience around AD 93, included a passage about Jesus in his Antiquities of the Jews that has been debated for centuries. Most scholars conclude it has an authentic core that was embellished by later Christian copyists. Josephus\u2019s second reference \u2014 "the brother of Jesus who was called Christ, whose name was James" \u2014 is accepted as authentic by virtually all scholars. The offhand way Josephus introduces Jesus suggests he was a known historical figure even in non-Christian Jewish circles.`,
+  otRef: null,
+  ot: ``,
+  nt: `Reconstructed core of the Testimonium: "About this time there lived Jesus, a wise man. For he was one who performed surprising deeds and was a teacher of such people as accept the truth gladly. He won over many Jews and many of the Greeks. And when, upon the accusation of the principal men among us, Pilate had condemned him to a cross, those who had first come to love him did not cease. And the tribe of the Christians, so called after him, has still to this day not disappeared."\n\nSecond reference (Antiquities 20.9.1): "the brother of Jesus, who was called Christ, whose name was James"`,
+  hlKey: '',
+  sources: 'Josephus, Antiquities 18.3.3, 20.9.1; Goldberg, "The Coincidences of the Testimonium" (1995); Meier, A Marginal Jew vol. 1; Bruce, NT Documents',
+  conns: ['H2', 'H3', 'H1'],
+  threads: []
+},
+];
+
+// ── THREADS ──
+const threads = {
+  all: nodes.map(n => n.id),
+  piercing: ['P2', 'P3', 'P6', 'T3', 'T8', 'S7'],
+  lamb: ['T1', 'T2', 'P2', 'S2', 'L1', 'L4', 'C3'],
+  substitution: ['T1', 'T2', 'T3', 'T4', 'T5', 'P2', 'L3', 'L4', 'C2'],
+  access: ['L3', 'T4', 'T7', 'L5', 'L6', 'G1', 'G3', 'S4'],
+  covenant: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'L1'],
+  thirdday: ['S3', 'T2', 'T11', 'L7', 'H1'],
+};
+
+// ── CONNECTION PAIRS ──
+const connectionPairs = [];
+const seen = new Set();
+nodes.forEach(n => {
+  n.conns.forEach(targetId => {
+    const key = [n.id, targetId].sort().join('-');
+    if (!seen.has(key) && nodes.find(x => x.id === targetId)) {
+      seen.add(key);
+      connectionPairs.push([n.id, targetId]);
+    }
+  });
+});
+
+// ── STATE ──
+let currentMode = 'thread';
+let currentThread = 'all';
+let hoveredNodeId = null;
+
+// ── ZOOM / PAN STATE ──
+let zoom = 0.55;
+let panX = 0, panY = 0;
+let isPanning = false, panStartX = 0, panStartY = 0;
+
+// ── DOM REFS ──
+const canvas = document.getElementById('canvas');
+const canvasInner = document.getElementById('canvasInner');
+const nodesContainer = document.getElementById('nodesContainer');
+const connectionsSvg = document.getElementById('connectionsSvg');
+const timelineLayer = document.getElementById('timelineLayer');
+const tlSvg = document.getElementById('tlSvg');
+const tlAxis = document.getElementById('tlAxis');
+const tlDotsContainer = document.getElementById('tlDotsContainer');
+const textListInner = document.getElementById('textListInner');
+const textList = document.getElementById('textList');
+const readingPanel = document.getElementById('readingPanel');
+const readingOverlay = document.getElementById('readingOverlay');
+const rpContent = document.getElementById('rpContent');
+const rpHeaderLabel = document.getElementById('rpHeaderLabel');
+const threadBar = document.getElementById('threadBar');
+const zoomControls = document.getElementById('zoomControls');
+
+// ── ORGANIC LAYOUT ──
+function seededRand(seed) {
+  let s = seed;
+  return () => { s = (s * 16807 + 11) % 2147483647; return (s & 0x7fffffff) / 0x7fffffff; };
+}
+
+const clusterCenters = {
+  'Prophetic':   { cx: 340, cy: 260 },
+  'Typological': { cx: 1100, cy: 240 },
+  'Liturgical':  { cx: 1800, cy: 300 },
+  'Covenantal':  { cx: 380, cy: 800 },
+  'Structural':  { cx: 1100, cy: 850 },
+  'Geographic':  { cx: 1800, cy: 780 },
+  'Historical':  { cx: 1100, cy: 1300 },
+};
+
+const organicPositions = {};
+function computeOrganicPositions() {
+  const placed = [];
+  nodes.forEach((node, i) => {
+    const hash = node.id.split('').reduce((a, c, j) => a * 31 + c.charCodeAt(0) * (j + 1), 7);
+    const rng = seededRand(hash);
+    const center = clusterCenters[node.cat];
+    const catNodes = nodes.filter(n => n.cat === node.cat);
+    const catIdx = catNodes.indexOf(node);
+    const spread = Math.min(catNodes.length * 22, 260);
+
+    let x, y, attempts = 0;
+    do {
+      const angle = rng() * Math.PI * 2;
+      const r = rng() * spread;
+      x = center.cx + Math.cos(angle) * r;
+      y = center.cy + Math.sin(angle) * r;
+      attempts++;
+    } while (attempts < 30 && placed.some(p => Math.abs(p.x - x) < 155 && Math.abs(p.y - y) < 70));
+
+    // Small rotation for organic feel
+    const rot = (rng() - 0.5) * 3;
+    organicPositions[node.id] = { x, y, rot };
+    placed.push({ x, y });
+  });
+}
+computeOrganicPositions();
+
+// ── THREAD FILTER POSITIONS ──
+function getThreadPositions(threadNodeIds) {
+  const count = threadNodeIds.length;
+  const cols = Math.min(count, 4);
+  const rows = Math.ceil(count / cols);
+  const startX = 1100 - (cols * 230) / 2;
+  const startY = 800 - (rows * 180) / 2;
+  const positions = {};
+  threadNodeIds.forEach((id, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    positions[id] = { x: startX + col * 230, y: startY + row * 180, rot: 0 };
+  });
+  return positions;
+}
+
+// ── APPLY TRANSFORM ──
+function applyTransform() {
+  canvasInner.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+}
+
+// ── ZOOM / PAN HANDLERS ──
+canvas.addEventListener('wheel', (e) => {
+  if (currentMode !== 'thread') return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const oldZoom = zoom;
+  zoom *= e.deltaY > 0 ? 0.93 : 1.07;
+  zoom = Math.max(0.3, Math.min(2.5, zoom));
+  panX = mx - (mx - panX) * (zoom / oldZoom);
+  panY = my - (my - panY) * (zoom / oldZoom);
+  applyTransform();
+  drawConnections();
+}, { passive: false });
+
+canvas.addEventListener('mousedown', (e) => {
+  if (currentMode !== 'thread') return;
+  if (e.target.closest('.node')) return;
+  isPanning = true;
+  panStartX = e.clientX - panX;
+  panStartY = e.clientY - panY;
+  canvas.classList.add('panning');
+});
+window.addEventListener('mousemove', (e) => {
+  if (!isPanning) return;
+  panX = e.clientX - panStartX;
+  panY = e.clientY - panStartY;
+  applyTransform();
+  drawConnections();
+});
+window.addEventListener('mouseup', () => {
+  isPanning = false;
+  canvas.classList.remove('panning');
+});
+
+document.getElementById('zoomIn').addEventListener('click', () => {
+  zoom = Math.min(2.5, zoom * 1.25);
+  applyTransform(); drawConnections();
+});
+document.getElementById('zoomOut').addEventListener('click', () => {
+  zoom = Math.max(0.3, zoom * 0.8);
+  applyTransform(); drawConnections();
+});
+document.getElementById('zoomReset').addEventListener('click', () => {
+  zoom = 0.55; panX = 0; panY = 0;
+  applyTransform(); drawConnections();
+});
+
+// ── CREATE NODE ELEMENTS ──
+nodes.forEach(node => {
+  const color = catColors[node.cat];
+  const el = document.createElement('div');
+  el.className = 'node';
+  el.id = `node-${node.id}`;
+  el.innerHTML = `
+    <div class="node-card">
+      <div class="node-id"><span class="cat-dot" style="background:${color}"></span>${node.id}</div>
+      <div class="node-title">${node.title}</div>
+      <div class="node-desc">${node.desc}</div>
+      <div class="node-date">${node.date}</div>
+    </div>
+  `;
+  el.addEventListener('click', (e) => { e.stopPropagation(); openReading(node); });
+  el.addEventListener('mouseenter', () => { hoveredNodeId = node.id; applyHover(); });
+  el.addEventListener('mouseleave', () => { hoveredNodeId = null; applyHover(); });
+  nodesContainer.appendChild(el);
+});
+
+// ── CREATE CATEGORY LABELS ──
+Object.entries(clusterCenters).forEach(([cat, pos]) => {
+  const label = document.createElement('div');
+  label.className = 'cat-label';
+  label.innerHTML = `<span class="cl-dot" style="background:${catColors[cat]}"></span>${cat}`;
+  label.style.left = (pos.cx - 40) + 'px';
+  label.style.top = (pos.cy - 200) + 'px';
+  canvasInner.appendChild(label);
+});
+
+// ── CREATE TEXT LIST ──
+const catOrder = ['Prophetic', 'Typological', 'Liturgical', 'Covenantal', 'Structural', 'Geographic', 'Historical'];
+catOrder.forEach(cat => {
+  const catNodes = nodes.filter(n => n.cat === cat);
+  if (!catNodes.length) return;
+  const hdr = document.createElement('div');
+  hdr.className = 'text-cat-header';
+  hdr.innerHTML = `<span class="tch-dot" style="background:${catColors[cat]}"></span>${cat}`;
+  textListInner.appendChild(hdr);
+  catNodes.forEach(node => {
+    const el = document.createElement('div');
+    el.className = 'text-item';
+    el.innerHTML = `
+      <div class="ti-header">
+        <span class="ti-id" style="color:${catColors[node.cat]}">${node.id}</span>
+        <span class="ti-title">${node.title}</span>
+        <span class="ti-date">${node.date}</span>
+      </div>
+      <div class="ti-preview">${node.whoa || node.desc}</div>
+      <div class="ti-connections-count">${node.conns.length} connections</div>
+    `;
+    el.addEventListener('click', () => openReading(node));
+    textListInner.appendChild(el);
+  });
+});
+
+// ── CREATE TIMELINE DOTS ──
+function buildTimeline() {
+  tlDotsContainer.innerHTML = '';
+  tlSvg.innerHTML = '';
+  tlAxis.innerHTML = '';
+
+  const axisRect = tlAxis.getBoundingClientRect();
+  const layerRect = timelineLayer.getBoundingClientRect();
+  const axisLeft = axisRect.left - layerRect.left;
+  const axisWidth = axisRect.width;
+  const axisTop = axisRect.top - layerRect.top;
+
+  // Year to X position
+  const minY = -4000, maxY = 200;
+  function yearToX(year) {
+    const norm = (year - minY) / (maxY - minY);
+    return axisLeft + norm * axisWidth;
+  }
+
+  // Era labels
+  const eras = [
+    { label: '4000 BC', year: -4000 },
+    { label: '2000 BC', year: -2000 },
+    { label: '1000 BC', year: -1000 },
+    { label: '500 BC', year: -500 },
+    { label: '0', year: 0 },
+    { label: 'AD 100', year: 100 },
+  ];
+  eras.forEach(era => {
+    const el = document.createElement('span');
+    el.className = 'tl-era';
+    el.textContent = era.label;
+    el.style.left = yearToX(era.year) + 'px';
+    tlAxis.appendChild(el);
+  });
+
+  // Sort nodes by year for staggered offset
+  const sorted = [...nodes].sort((a, b) => a.year - b.year);
+  const dotPositions = {};
+
+  // Place dots with stagger to avoid overlap
+  sorted.forEach((node, i) => {
+    const x = yearToX(node.year);
+    const color = catColors[node.cat];
+
+    // Stagger vertically if close to neighbors
+    let yOff = 0;
+    const nearby = sorted.filter((n, j) => j !== i && Math.abs(yearToX(n.year) - x) < 18);
+    if (nearby.length > 0) {
+      const slot = sorted.filter(n => Math.abs(yearToX(n.year) - x) < 18).indexOf(node);
+      yOff = (slot % 2 === 0 ? -1 : 1) * (Math.floor(slot / 2) + 1) * 14;
+    }
+
+    const dotX = x;
+    const dotY = axisTop + yOff;
+    dotPositions[node.id] = { x: dotX, y: dotY };
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `position:absolute;left:${dotX}px;top:${dotY}px;`;
+    wrapper.innerHTML = `
+      <div class="tl-dot" style="background:${color};" data-id="${node.id}">
+        <div class="tl-tooltip">
+          <div class="tl-tooltip-title">${node.title}</div>
+          <div class="tl-tooltip-meta">${node.id} · ${node.date}</div>
+        </div>
+      </div>
+      <div class="tl-dot-label">${node.id}</div>
+    `;
+    wrapper.querySelector('.tl-dot').addEventListener('click', () => openReading(node));
+    wrapper.querySelector('.tl-dot').addEventListener('mouseenter', () => {
+      hoveredNodeId = node.id;
+      drawTimelineArcs(dotPositions);
+    });
+    wrapper.querySelector('.tl-dot').addEventListener('mouseleave', () => {
+      hoveredNodeId = null;
+      drawTimelineArcs(dotPositions);
+    });
+    tlDotsContainer.appendChild(wrapper);
+  });
+
+  drawTimelineArcs(dotPositions);
+}
+
+function drawTimelineArcs(dotPositions) {
+  tlSvg.innerHTML = '';
+  const hovConns = hoveredNodeId ? (nodes.find(n => n.id === hoveredNodeId)?.conns || []) : [];
+
+  connectionPairs.forEach(([aId, bId]) => {
+    const a = dotPositions[aId];
+    const b = dotPositions[bId];
+    if (!a || !b) return;
+
+    const isHoverArc = hoveredNodeId && (aId === hoveredNodeId || bId === hoveredNodeId);
+    const isHovering = hoveredNodeId !== null;
+
+    const dist = Math.abs(b.x - a.x);
+    const arcH = 30 + dist * 0.08;
+    const peakY = Math.min(a.y, b.y) - arcH;
+    const midX = (a.x + b.x) / 2;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${a.x} ${a.y} Q ${midX} ${peakY} ${b.x} ${b.y}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'var(--accent)');
+    path.setAttribute('stroke-width', isHoverArc ? '1.5' : '0.8');
+    path.setAttribute('opacity', isHovering ? (isHoverArc ? '0.6' : '0.04') : '0.12');
+    tlSvg.appendChild(path);
+  });
+}
+
+// ── POSITION NODES ──
+function positionNodes() {
+  const isFiltered = currentThread !== 'all';
+  const activeIds = isFiltered ? threads[currentThread] : [];
+  const threadPos = isFiltered ? getThreadPositions(activeIds) : null;
+
+  nodes.forEach(node => {
+    const el = document.getElementById(`node-${node.id}`);
+    if (currentMode !== 'thread') {
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      return;
+    }
+
+    let pos;
+    if (isFiltered) {
+      if (activeIds.includes(node.id)) {
+        pos = threadPos[node.id];
+        el.classList.add('expanded');
+        el.classList.remove('dimmed');
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+      } else {
+        pos = organicPositions[node.id];
+        el.classList.remove('expanded');
+        el.classList.add('dimmed');
+        el.style.opacity = '';
+        el.style.pointerEvents = '';
+      }
+    } else {
+      pos = organicPositions[node.id];
+      el.classList.remove('expanded', 'dimmed', 'highlighted');
+      el.style.opacity = '1';
+      el.style.pointerEvents = 'auto';
+    }
+
+    el.style.left = pos.x + 'px';
+    el.style.top = pos.y + 'px';
+    el.style.transform = `rotate(${pos.rot || 0}deg)`;
+  });
+}
+
+// ── DRAW CONNECTIONS (thread mode) ──
+function drawConnections() {
+  connectionsSvg.innerHTML = '';
+  if (currentMode !== 'thread') return;
+
+  const isFiltered = currentThread !== 'all';
+  const activeIds = isFiltered ? threads[currentThread] : [];
+  const hovConns = hoveredNodeId ? (nodes.find(n => n.id === hoveredNodeId)?.conns || []) : [];
+
+  // SVG needs to match the canvas-inner coordinate space
+  connectionsSvg.setAttribute('width', '2200');
+  connectionsSvg.setAttribute('height', '1600');
+  connectionsSvg.style.width = '2200px';
+  connectionsSvg.style.height = '1600px';
+
+  connectionPairs.forEach(([aId, bId]) => {
+    const aEl = document.getElementById(`node-${aId}`);
+    const bEl = document.getElementById(`node-${bId}`);
+    if (!aEl || !bEl) return;
+
+    const ax = parseFloat(aEl.style.left) + 72;
+    const ay = parseFloat(aEl.style.top) + 30;
+    const bx = parseFloat(bEl.style.left) + 72;
+    const by = parseFloat(bEl.style.top) + 30;
+
+    const isHoverLine = hoveredNodeId && (aId === hoveredNodeId || bId === hoveredNodeId);
+    const isHovering = hoveredNodeId !== null;
+    const isThreadLine = isFiltered && activeIds.includes(aId) && activeIds.includes(bId);
+
+    let stroke, width, opacity, dash;
+    if (isHovering) {
+      stroke = isHoverLine ? 'var(--accent)' : 'var(--border)';
+      width = isHoverLine ? '1.5' : '0.5';
+      opacity = isHoverLine ? '0.6' : '0.04';
+      dash = isHoverLine ? null : '3,5';
+    } else if (isFiltered) {
+      stroke = isThreadLine ? 'var(--accent)' : 'var(--border)';
+      width = isThreadLine ? '1.5' : '0.5';
+      opacity = isThreadLine ? '0.5' : '0.03';
+      dash = isThreadLine ? null : '3,5';
+    } else {
+      stroke = 'var(--border)';
+      width = '0.8';
+      opacity = '0.25';
+      dash = '4,6';
+    }
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', ax); line.setAttribute('y1', ay);
+    line.setAttribute('x2', bx); line.setAttribute('y2', by);
+    line.setAttribute('stroke', stroke);
+    line.setAttribute('stroke-width', width);
+    line.setAttribute('opacity', opacity);
+    if (dash) line.setAttribute('stroke-dasharray', dash);
+    connectionsSvg.appendChild(line);
+  });
+}
+
+// ── HOVER HIGHLIGHTING ──
+function applyHover() {
+  if (currentMode !== 'thread') return;
+  const isFiltered = currentThread !== 'all';
+  const activeIds = isFiltered ? threads[currentThread] : [];
+  const connIds = hoveredNodeId
+    ? nodes.find(n => n.id === hoveredNodeId)?.conns.filter(cId => nodes.find(x => x.id === cId)) || []
+    : [];
+
+  nodes.forEach(node => {
+    const el = document.getElementById(`node-${node.id}`);
+    if (hoveredNodeId) {
+      const isConn = node.id === hoveredNodeId || connIds.includes(node.id);
+      if (isFiltered && !activeIds.includes(node.id)) {
+        el.classList.add('dimmed');
+        el.classList.remove('highlighted');
+      } else {
+        el.classList.toggle('dimmed', !isConn);
+        el.classList.toggle('highlighted', isConn);
+      }
+    } else {
+      if (isFiltered) {
+        el.classList.toggle('dimmed', !activeIds.includes(node.id));
+        el.classList.remove('highlighted');
+      } else {
+        el.classList.remove('dimmed', 'highlighted');
+      }
+    }
+  });
+  drawConnections();
+}
+
+// ── READING PANEL ──
+function parseHighlights(text) {
+  return text.replace(/\[([A-H]):([^\]]+)\]/g,
+    '<span class="hl hl-$1" data-hl="$1">$2</span>');
+}
+function renderText(text) {
+  if (!text) return '';
+  let html = parseHighlights(text);
+  html = html.replace(/\n\n/g, '<br><br>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+function openReading(node) {
+  const color = catColors[node.cat];
+  rpHeaderLabel.textContent = `${node.id} — ${node.cat}`;
+  rpHeaderLabel.style.color = color;
+
+  const connHtml = node.conns.map(cId => {
+    const cn = nodes.find(n => n.id === cId);
+    if (!cn) return `<li><span class="conn-id">${cId}</span><span style="color:var(--text-muted)">(not loaded)</span></li>`;
+    return `<li onclick="openReading(nodes.find(n=>n.id==='${cId}'))"><span class="conn-id">${cn.id}</span>${cn.title}</li>`;
+  }).join('');
+
+  const hasOt = node.ot && node.ot.trim();
+  const hasNt = node.nt && node.nt.trim();
+  const hasHlKey = node.hlKey && node.hlKey.trim();
+  const isPattern = !node.otRef;
+
+  let contentHtml = `
+    <div class="rp-id" style="color:${color}"><span class="rp-cat-dot" style="background:${color}"></span>${node.cat}</div>
+    <h2>${node.title}</h2>
+    <div class="rp-date">${node.date}</div>
+    <div class="rp-section">
+      <div class="rp-section-title">The Whoa</div>
+      <div class="rp-text">${node.whoa}</div>
+    </div>`;
+
+  if (isPattern) {
+    if (hasOt) contentHtml += `<div class="rp-section"><div class="rp-section-title">The Pattern</div><div class="rp-text">${renderText(node.ot)}</div></div>`;
+    if (hasNt) contentHtml += `<div class="rp-section"><div class="rp-section-title">NT Fulfillment</div><div class="rp-text">${renderText(node.nt)}</div></div>`;
+  } else {
+    if (hasOt) contentHtml += `<div class="rp-section"><div class="rp-section-title">OT Text</div><div class="rp-ref">${node.otRef}</div><div class="rp-text">${renderText(node.ot)}</div></div>`;
+    if (hasNt) contentHtml += `<div class="rp-section"><div class="rp-section-title">NT Text</div><div class="rp-text">${renderText(node.nt)}</div></div>`;
+  }
+
+  if (hasHlKey) contentHtml += `<div class="rp-section"><div class="rp-section-title">Highlight Key</div><div class="hl-key">${node.hlKey}</div></div>`;
+
+  contentHtml += `
+    <div class="rp-section"><div class="rp-section-title">Sources</div><div class="rp-sources">${node.sources}</div></div>
+    <div class="rp-section"><div class="rp-section-title">Connections</div><ul class="rp-connections-list">${connHtml}</ul></div>`;
+
+  rpContent.innerHTML = contentHtml;
+
+  rpContent.querySelectorAll('.hl').forEach(span => {
+    span.addEventListener('mouseenter', () => {
+      rpContent.querySelectorAll(`.hl[data-hl="${span.dataset.hl}"]`).forEach(s => s.classList.add('active'));
+    });
+    span.addEventListener('mouseleave', () => {
+      rpContent.querySelectorAll(`.hl[data-hl="${span.dataset.hl}"]`).forEach(s => s.classList.remove('active'));
+    });
+  });
+
+  readingPanel.classList.add('open');
+  readingOverlay.classList.add('open');
+  readingPanel.scrollTop = 0;
+}
+
+function closeReading() {
+  readingPanel.classList.remove('open');
+  readingOverlay.classList.remove('open');
+}
+
+document.getElementById('rpClose').addEventListener('click', closeReading);
+readingOverlay.addEventListener('click', closeReading);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReading(); });
+
+// ── MODE SWITCHING ──
+function setMode(mode) {
+  currentMode = mode;
+  closeReading();
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+
+  threadBar.classList.toggle('visible', mode === 'thread');
+  canvas.style.display = mode === 'thread' ? '' : 'none';
+  timelineLayer.classList.toggle('visible', mode === 'timeline');
+  textList.classList.toggle('visible', mode === 'text');
+  zoomControls.style.display = mode === 'thread' ? '' : 'none';
+
+  nodes.forEach(node => {
+    const el = document.getElementById(`node-${node.id}`);
+    el.classList.remove('dimmed', 'highlighted', 'expanded');
+  });
+
+  if (mode === 'thread') {
+    positionNodes();
+    applyTransform();
+    setTimeout(() => drawConnections(), 50);
+    setTimeout(() => drawConnections(), 900);
+  }
+
+  if (mode === 'timeline') {
+    setTimeout(buildTimeline, 100);
+  }
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => setMode(btn.dataset.mode));
+});
+
+// ── THREAD SWITCHING ──
+document.querySelectorAll('.thread-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentThread = btn.dataset.thread;
+    document.querySelectorAll('.thread-btn').forEach(b => b.classList.toggle('active', b === btn));
+    hoveredNodeId = null;
+    positionNodes();
+    setTimeout(() => drawConnections(), 50);
+    setTimeout(() => drawConnections(), 700);
+  });
+});
+
+// ── INIT ──
+positionNodes();
+applyTransform();
+setTimeout(() => drawConnections(), 100);
+
+window.addEventListener('resize', () => {
+  if (currentMode === 'thread') drawConnections();
+  if (currentMode === 'timeline') buildTimeline();
+});
+
+window.nodes = nodes;
+window.openReading = openReading;
+</script>
+
+</body>
+</html>
