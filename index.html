@@ -142,12 +142,13 @@
 
   /* ── Category floating labels ── */
   .cat-label {
-    position: absolute; z-index: 0;
+    position: absolute; z-index: 3;
     font-family: 'Inter', sans-serif;
-    font-size: 11px; font-weight: 500;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    opacity: 0.25; pointer-events: none;
-    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    opacity: 0.18; pointer-events: none;
+    display: flex; align-items: center; gap: 7px;
+    transform: translate(-50%, -50%);
   }
   .cat-label .cl-dot {
     width: 7px; height: 7px; border-radius: 50%;
@@ -173,7 +174,8 @@
   }
   .node:hover .node-card {
     border-color: var(--accent);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-3px) scale(1.04);
     z-index: 5;
   }
   .node.dimmed { opacity: 0.07; pointer-events: none; }
@@ -1390,13 +1392,14 @@ function computeOrganicPositions() {
     const spread = Math.min(catNodes.length * 22, 260);
 
     let x, y, attempts = 0;
+    const minR = 60; // keep cards away from center label
     do {
       const angle = rng() * Math.PI * 2;
-      const r = rng() * spread;
+      const r = minR + rng() * spread;
       x = center.cx + Math.cos(angle) * r;
       y = center.cy + Math.sin(angle) * r;
       attempts++;
-    } while (attempts < 30 && placed.some(p => Math.abs(p.x - x) < 155 && Math.abs(p.y - y) < 70));
+    } while (attempts < 40 && placed.some(p => Math.abs(p.x - x) < 155 && Math.abs(p.y - y) < 70));
 
     // Small rotation for organic feel
     const rot = (rng() - 0.5) * 3;
@@ -1501,8 +1504,8 @@ Object.entries(clusterCenters).forEach(([cat, pos]) => {
   const label = document.createElement('div');
   label.className = 'cat-label';
   label.innerHTML = `<span class="cl-dot" style="background:${catColors[cat]}"></span>${cat}`;
-  label.style.left = (pos.cx - 40) + 'px';
-  label.style.top = (pos.cy - 200) + 'px';
+  label.style.left = pos.cx + 'px';
+  label.style.top = pos.cy + 'px';
   canvasInner.appendChild(label);
 });
 
